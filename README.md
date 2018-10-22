@@ -1,2 +1,14 @@
 # Earcut.swift
-A Swift port of Mapbox's earcut.js library
+A Swift port of Mapbox's [earcut.js](https://github.com/mapbox/earcut) polygon triangulation library.
+
+## Usage
+Pass Earcut a flat array of vertex coordinates and optionally include an array of hole indices, and the tesselate function will return a flat array of triangle indices.
+
+```
+let earcut = Earcut()
+let result = earcut.tesselate(data: [10, 0, 0, 50, 60, 60, 70, 10], holeIndices: nil)
+
+// result: [1, 0, 3, 3, 2, 1]
+```
+
+
