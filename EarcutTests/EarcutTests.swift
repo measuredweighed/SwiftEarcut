@@ -68,37 +68,37 @@ class EarcutTests: XCTestCase {
     }
     
     func testFixtures() {
-        areaTest(fixture: "building", expectedTriangles: 13);
-        areaTest(fixture: "dude", expectedTriangles: 106);
-        areaTest(fixture: "water", expectedTriangles: 2482, expectedDeviation: 0.0008);
-        areaTest(fixture: "water2", expectedTriangles: 1212);
-        areaTest(fixture: "water3", expectedTriangles: 197);
-        areaTest(fixture: "water3b", expectedTriangles: 25);
-        areaTest(fixture: "water4", expectedTriangles: 705);
-        areaTest(fixture: "water-huge", expectedTriangles: 5174, expectedDeviation: 0.0011);
-        areaTest(fixture: "water-huge2", expectedTriangles: 4461, expectedDeviation: 0.0028);
-        areaTest(fixture: "degenerate", expectedTriangles: 0);
-        areaTest(fixture: "bad-hole", expectedTriangles: 42, expectedDeviation: 0.019);
-        areaTest(fixture: "empty-square", expectedTriangles: 0);
-        areaTest(fixture: "issue16", expectedTriangles: 12);
-        areaTest(fixture: "issue17", expectedTriangles: 11);
-        areaTest(fixture: "steiner", expectedTriangles: 9);
-        areaTest(fixture: "issue29", expectedTriangles: 40);
-        areaTest(fixture: "issue34", expectedTriangles: 139);
-        areaTest(fixture: "issue35", expectedTriangles: 844);
-        areaTest(fixture: "self-touching", expectedTriangles: 124, expectedDeviation: 3.4e-14);
-        areaTest(fixture: "outside-ring", expectedTriangles: 64);
-        areaTest(fixture: "simplified-us-border", expectedTriangles: 120);
-        areaTest(fixture: "touching-holes", expectedTriangles: 57);
-        areaTest(fixture: "hole-touching-outer", expectedTriangles: 77);
-        areaTest(fixture: "hilbert", expectedTriangles: 1024);
-        areaTest(fixture: "issue45", expectedTriangles: 10);
-        areaTest(fixture: "eberly-3", expectedTriangles: 73);
-        areaTest(fixture: "eberly-6", expectedTriangles: 1429);
-        areaTest(fixture: "issue52", expectedTriangles: 109);
-        areaTest(fixture: "shared-points", expectedTriangles: 4);
-        areaTest(fixture: "bad-diagonals", expectedTriangles: 7);
-        areaTest(fixture: "issue83", expectedTriangles: 0, expectedDeviation: 1e-14);
+        areaTest(fixture: "building", expectedTriangles: 13)
+        areaTest(fixture: "dude", expectedTriangles: 106)
+        areaTest(fixture: "water", expectedTriangles: 2482, expectedDeviation: 0.0008)
+        areaTest(fixture: "water2", expectedTriangles: 1212)
+        areaTest(fixture: "water3", expectedTriangles: 197)
+        areaTest(fixture: "water3b", expectedTriangles: 25)
+        areaTest(fixture: "water4", expectedTriangles: 705)
+        areaTest(fixture: "water-huge", expectedTriangles: 5174, expectedDeviation: 0.0011)
+        areaTest(fixture: "water-huge2", expectedTriangles: 4461, expectedDeviation: 0.0028)
+        areaTest(fixture: "degenerate", expectedTriangles: 0)
+        areaTest(fixture: "bad-hole", expectedTriangles: 42, expectedDeviation: 0.019)
+        areaTest(fixture: "empty-square", expectedTriangles: 0)
+        areaTest(fixture: "issue16", expectedTriangles: 12)
+        areaTest(fixture: "issue17", expectedTriangles: 11)
+        areaTest(fixture: "steiner", expectedTriangles: 9)
+        areaTest(fixture: "issue29", expectedTriangles: 40)
+        areaTest(fixture: "issue34", expectedTriangles: 139)
+        areaTest(fixture: "issue35", expectedTriangles: 844)
+        areaTest(fixture: "self-touching", expectedTriangles: 124, expectedDeviation: 3.4e-14)
+        areaTest(fixture: "outside-ring", expectedTriangles: 64)
+        areaTest(fixture: "simplified-us-border", expectedTriangles: 120)
+        areaTest(fixture: "touching-holes", expectedTriangles: 57)
+        areaTest(fixture: "hole-touching-outer", expectedTriangles: 77)
+        areaTest(fixture: "hilbert", expectedTriangles: 1024)
+        areaTest(fixture: "issue45", expectedTriangles: 10)
+        areaTest(fixture: "eberly-3", expectedTriangles: 73)
+        areaTest(fixture: "eberly-6", expectedTriangles: 1429)
+        areaTest(fixture: "issue52", expectedTriangles: 109)
+        areaTest(fixture: "shared-points", expectedTriangles: 4)
+        areaTest(fixture: "bad-diagonals", expectedTriangles: 7)
+        areaTest(fixture: "issue83", expectedTriangles: 0, expectedDeviation: 1e-14)
     }
     
     func testOpsPerSec() {
