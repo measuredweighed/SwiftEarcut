@@ -10,19 +10,13 @@
 
 import Foundation
 
-/**
- Scalar is the type used through Earcut. If you'd rather
- deal with `Float` values, you can change that here
- */
-public typealias Scalar = Double
-
 final class Node : Equatable {
     // vertex index in coord array
     var i:Int
     
     // vertex coordinates
-    var x:Scalar
-    var y:Scalar
+    var x:Double
+    var y:Double
     
     // z-order curve value
     var z:Int = 0
@@ -38,7 +32,7 @@ final class Node : Equatable {
     // indicates whether this is a steiner point
     var steiner:Bool = false
     
-    init(i:Int, x:Scalar, y:Scalar) {
+    init(i:Int, x:Double, y:Double) {
         self.i = i
         self.x = x
         self.y = y
@@ -58,7 +52,7 @@ final class Node : Equatable {
 final class NodeAllocator {
     var nodes:[Node] = [Node]()
     
-    public func create(i:Int, x:Scalar, y:Scalar) -> Node {
+    public func create(i:Int, x:Double, y:Double) -> Node {
         let node = Node(i: i, x: x, y: y)
         nodes.append(node)
         return node
@@ -76,8 +70,8 @@ final class NodeAllocator {
 }
 
 
-fileprivate func signedArea(data:[Scalar], start:Int, end:Int, dim:Int=2) -> Scalar {
-    var sum:Scalar = 0
+fileprivate func signedArea(data:[Double], start:Int, end:Int, dim:Int=2) -> Double {
+    var sum:Double = 0
     var j:Int = end - dim
     for i in stride(from: start, to:end, by: dim) {
         sum += (data[j] - data[i]) * (data[i+1] + data[j+1])
@@ -89,7 +83,7 @@ fileprivate func signedArea(data:[Scalar], start:Int, end:Int, dim:Int=2) -> Sca
 final public class Earcut {
     var allocator = NodeAllocator()
     
-    public func tesselate(data:[Scalar], holeIndices:[Int]?, dim:Int=2) -> [Int] {
+    public func tesselate(data:[Double], holeIndices:[Int]?, dim:Int=2) -> [Int] {
         let hasHoles:Bool = holeIndices != nil && holeIndices!.count > 0
         let outerLen:Int = hasHoles ? holeIndices![0] * dim : data.count
         
@@ -103,11 +97,11 @@ final public class Earcut {
             clockwise: true
         ) else { return triangles }
         
-        var minX:Scalar = 0
-        var maxX:Scalar = 0
-        var minY:Scalar = 0
-        var maxY:Scalar = 0
-        var invSize:Scalar = 0
+        var minX:Double = 0
+        var maxX:Double = 0
+        var minY:Double = 0
+        var maxY:Double = 0
+        var invSize:Double = 0
         
         if hasHoles {
             outerNode = eliminateHoles(data, holeIndices!, outerNode, dim)
@@ -121,8 +115,8 @@ final public class Earcut {
             maxY = minY
             
             for i in stride(from: dim, to:outerLen, by: dim) {
-                let x:Scalar = data[i]
-                let y:Scalar = data[i+1]
+                let x:Double = data[i]
+                let y:Double = data[i+1]
                 if x < minX { minX = x }
                 if y < minY { minY = y }
                 if x > maxX { maxX = x }
@@ -143,7 +137,7 @@ final public class Earcut {
     }
     
     // create a circular doubly linked list from polygon points in the specified winding order
-    private func linkedList(allocator:NodeAllocator, data:[Scalar], start:Int, end:Int, dim:Int=2, clockwise:Bool=true) -> Node? {
+    private func linkedList(allocator:NodeAllocator, data:[Double], start:Int, end:Int, dim:Int=2, clockwise:Bool=true) -> Node? {
         var last:Node?
         
         if clockwise == (signedArea(data: data, start: start, end: end, dim: dim) > 0) {
@@ -197,11 +191,11 @@ final public class Earcut {
         return leftMost
     }
     
-    public func flatten(data:[[[Scalar]]]) -> (vertices:[Scalar], holes:[Int], dim:Int) {
+    public func flatten(data:[[[Double]]]) -> (vertices:[Double], holes:[Int], dim:Int) {
         let dim = data[0][0].count
         
         var holeIndex:Int = 0
-        var result:(vertices:[Scalar], holes:[Int], dim:Int) = (vertices:[Scalar](), holes:[Int](), dim:dim)
+        var result:(vertices:[Double], holes:[Int], dim:Int) = (vertices:[Double](), holes:[Int](), dim:dim)
         for i in 0 ..< data.count {
             for j in 0 ..< data[i].count {
                 for d in 0 ..< dim {
@@ -219,11 +213,11 @@ final public class Earcut {
     
     // return a percentage difference between the polygon area and its triangulation area;
     // used to verify correctness of triangulation
-    public func deviation(data:[Scalar], holeIndices:[Int]?, dim:Int=2, indices:[Int]) -> Scalar {
+    public func deviation(data:[Double], holeIndices:[Int]?, dim:Int=2, indices:[Int]) -> Double {
         let hasHoles:Bool = holeIndices != nil && holeIndices!.count > 0
         let outerLen:Int = hasHoles ? holeIndices![0] * dim : data.count
         
-        var polygonArea:Scalar = abs(signedArea(data: data, start: 0, end: outerLen, dim: dim))
+        var polygonArea:Double = abs(signedArea(data: data, start: 0, end: outerLen, dim: dim))
         if hasHoles {
             let len = holeIndices!.count
             for i in 0 ..< len {
@@ -233,7 +227,7 @@ final public class Earcut {
             }
         }
         
-        var trianglesArea:Scalar = 0
+        var trianglesArea:Double = 0
         for i in stride(from: 0, to: indices.count, by: 3) {
             let a = indices[i] * dim
             let b = indices[i+1] * dim
@@ -274,7 +268,7 @@ final public class Earcut {
     
     
     // MARK:- Logic
-    private func earcutLinked(_ _ear:Node?, _ triangles:inout[Int], _ dim:Int, _ minX:Scalar, _ minY:Scalar, _ invSize:Scalar, _ pass:Int=0) {
+    private func earcutLinked(_ _ear:Node?, _ triangles:inout[Int], _ dim:Int, _ minX:Double, _ minY:Double, _ invSize:Double, _ pass:Int=0) {
         guard var ear:Node = _ear else { return }
         
         if pass == 0 && invSize > 0 {
@@ -347,17 +341,17 @@ final public class Earcut {
         
         return true
     }
-private func isEarHashed(_ ear:Node, _ minX:Scalar, _ minY:Scalar, _ invSize:Scalar) -> Bool {
+private func isEarHashed(_ ear:Node, _ minX:Double, _ minY:Double, _ invSize:Double) -> Bool {
     let a = ear.prev!
     let b = ear
     let c = ear.next!
     
     if area(a, b, c) >= 0 { return false }  // reflex, can't be an ear
     
-    let minTX:Scalar = a.x < b.x ? (a.x < c.x ? a.x : c.x) : (b.x < c.x ? b.x : c.x)
-    let minTY:Scalar = a.y < b.y ? (a.y < c.y ? a.y : c.y) : (b.y < c.y ? b.y : c.y)
-    let maxTX:Scalar = a.x > b.x ? (a.x > c.x ? a.x : c.x) : (b.x > c.x ? b.x : c.x)
-    let maxTY:Scalar = a.y > b.y ? (a.y > c.y ? a.y : c.y) : (b.y > c.y ? b.y : c.y)
+    let minTX:Double = a.x < b.x ? (a.x < c.x ? a.x : c.x) : (b.x < c.x ? b.x : c.x)
+    let minTY:Double = a.y < b.y ? (a.y < c.y ? a.y : c.y) : (b.y < c.y ? b.y : c.y)
+    let maxTX:Double = a.x > b.x ? (a.x > c.x ? a.x : c.x) : (b.x > c.x ? b.x : c.x)
+    let maxTY:Double = a.y > b.y ? (a.y > c.y ? a.y : c.y) : (b.y > c.y ? b.y : c.y)
     
     // z-order range for the current triangle bbox;
     let minZ:Int = zOrder(minTX, minTY, minX, minY, invSize)
@@ -423,7 +417,7 @@ private func isEarHashed(_ ear:Node, _ minX:Scalar, _ minY:Scalar, _ invSize:Sca
     }
     
     // try splitting polygon into two and triangulate them independently
-    private func splitEarcut(_ start:Node, _ triangles:inout[Int], _ dim:Int = 2, _ minX:Scalar, _ minY:Scalar, _ invSize:Scalar) {
+    private func splitEarcut(_ start:Node, _ triangles:inout[Int], _ dim:Int = 2, _ minX:Double, _ minY:Double, _ invSize:Double) {
         // look for a valid diagonal that divides the polygon into two
         var a:Node = start
         repeat {
@@ -449,7 +443,7 @@ private func isEarHashed(_ ear:Node, _ minX:Scalar, _ minY:Scalar, _ invSize:Sca
     }
     
     // link every hole into the outer loop, producing a single-ring polygon without holes
-    private func eliminateHoles(_ data:[Scalar], _ holeIndices:[Int], _ _outerNode:Node, _ dim:Int=2) -> Node {
+    private func eliminateHoles(_ data:[Double], _ holeIndices:[Int], _ _outerNode:Node, _ dim:Int=2) -> Node {
         var outerNode = _outerNode
         var queue:[Node] = [Node]()
         var start:Int = 0
@@ -495,16 +489,16 @@ private func isEarHashed(_ ear:Node, _ minX:Scalar, _ minY:Scalar, _ invSize:Sca
     // David Eberly's algorithm for finding a bridge between hole and outer polygon
     private func findHoleBridge(hole:Node, outerNode:Node) -> Node? {
         var p:Node = outerNode
-        let hx:Scalar = hole.x
-        let hy:Scalar = hole.y
-        var qx:Scalar = -Scalar.infinity
+        let hx:Double = hole.x
+        let hy:Double = hole.y
+        var qx:Double = -Double.infinity
         var m:Node?
         
         // find a segment intersected by a ray from the hole's leftmost point to the left;
         // segment's endpoint with lesser x will be potential connection point
         repeat {
             if hy <= p.y && hy >= p.next!.y && p.next!.y != p.y {
-                let x:Scalar = p.x + (hy - p.y) * (p.next!.x - p.x) / (p.next!.y - p.y)
+                let x:Double = p.x + (hy - p.y) * (p.next!.x - p.x) / (p.next!.y - p.y)
                 if x <= hx && x > qx {
                     qx = x
                     if x == hx {
@@ -529,10 +523,10 @@ private func isEarHashed(_ ear:Node, _ minX:Scalar, _ minY:Scalar, _ invSize:Sca
         // if there are no points found, we have a valid connection;
         // otherwise choose the point of the minimum angle with the ray as connection point
         let stop:Node = m!
-        let mx:Scalar = m!.x
-        let my:Scalar = m!.y
-        var tanMin:Scalar = Scalar.infinity
-        var tan:Scalar = 0
+        let mx:Double = m!.x
+        let my:Double = m!.y
+        var tanMin:Double = Double.infinity
+        var tan:Double = 0
         
         p = m!.next!
         while p !== stop {
@@ -553,7 +547,7 @@ private func isEarHashed(_ ear:Node, _ minX:Scalar, _ minY:Scalar, _ invSize:Sca
     }
     
     // interlink polygon nodes in z-order
-    private func indexCurve(_ start:Node, _ minX:Scalar, _ minY:Scalar, _ invSize:Scalar) {
+    private func indexCurve(_ start:Node, _ minX:Double, _ minY:Double, _ invSize:Double) {
         var p = start
         repeat {
             p.z = p.z != 0 ? p.z : zOrder(p.x, p.y, minX, minY, invSize)
@@ -632,7 +626,7 @@ private func isEarHashed(_ ear:Node, _ minX:Scalar, _ minY:Scalar, _ invSize:Sca
     }
     
     // z-order of a point given coords and size of the data bounding box
-    private func zOrder(_ _x:Scalar, _ _y:Scalar, _ minX:Scalar, _ minY:Scalar, _ invSize:Scalar) -> Int {
+    private func zOrder(_ _x:Double, _ _y:Double, _ minX:Double, _ minY:Double, _ invSize:Double) -> Int {
         // coords are transformed into non-negative 15-bit integer range
         var x:Int = Int(32767 * (_x - minX) * invSize)
         var y:Int = Int(32767 * (_y - minY) * invSize)
@@ -650,7 +644,7 @@ private func isEarHashed(_ ear:Node, _ minX:Scalar, _ minY:Scalar, _ invSize:Sca
         return Int(x | (y << 1))
     }
     
-    private func pointInTriangle(_ ax:Scalar, _ ay:Scalar, _ bx:Scalar, _ by:Scalar, _ cx:Scalar, _ cy:Scalar, _ px:Scalar, _ py:Scalar) -> Bool {
+    private func pointInTriangle(_ ax:Double, _ ay:Double, _ bx:Double, _ by:Double, _ cx:Double, _ cy:Double, _ px:Double, _ py:Double) -> Bool {
         return (cx - px) * (ay - py) - (ax - px) * (cy - py) >= 0 &&
             (ax - px) * (by - py) - (bx - px) * (ay - py) >= 0 &&
             (bx - px) * (cy - py) - (cx - px) * (by - py) >= 0
@@ -660,7 +654,7 @@ private func isEarHashed(_ ear:Node, _ minX:Scalar, _ minY:Scalar, _ invSize:Sca
         return a.next!.i != b.i && a.prev!.i != b.i && !intersectsPolygon(a, b) &&
                 locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b)
     }
-    private func area(_ p:Node, _ q:Node, _ r:Node) -> Scalar {
+    private func area(_ p:Node, _ q:Node, _ r:Node) -> Double {
         return (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
     }
     private func intersects(_ p1:Node, _ q1:Node, _ p2:Node, _ q2:Node) -> Bool {
@@ -694,8 +688,8 @@ private func isEarHashed(_ ear:Node, _ minX:Scalar, _ minY:Scalar, _ invSize:Sca
     private func middleInside(_ a:Node, _ b:Node) -> Bool {
         var p:Node = a
         var inside:Bool = false
-        let px:Scalar = (a.x + b.x) / 2
-        let py:Scalar = (a.y + b.y) / 2
+        let px:Double = (a.x + b.x) / 2
+        let py:Double = (a.y + b.y) / 2
         repeat {
             if (((p.y > py) != (p.next!.y > py)) && p.next!.y != p.y &&
                 (px < (p.next!.x - p.x) * (py - p.y) / (p.next!.y - p.y) + p.x)) {
