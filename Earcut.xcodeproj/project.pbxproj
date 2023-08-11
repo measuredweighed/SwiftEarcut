@@ -3,45 +3,60 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		532608642A86893E0065D91A /* bad-diagonals.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608332A8688F60065D91A /* bad-diagonals.json */; };
+		532608652A86893E0065D91A /* bad-hole.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326082C2A8688F60065D91A /* bad-hole.json */; };
+		532608662A86893E0065D91A /* boxy.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326082B2A8688F60065D91A /* boxy.json */; };
+		532608672A86893E0065D91A /* building.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326082F2A8688F60065D91A /* building.json */; };
+		532608682A86893E0065D91A /* collinear-diagonal.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326081E2A8688F60065D91A /* collinear-diagonal.json */; };
+		532608692A86893E0065D91A /* degenerate.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608212A8688F60065D91A /* degenerate.json */; };
+		5326086A2A86893E0065D91A /* dude.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326083D2A8688F70065D91A /* dude.json */; };
+		5326086B2A86893E0065D91A /* eberly-3.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326081A2A8688F60065D91A /* eberly-3.json */; };
+		5326086C2A86893E0065D91A /* eberly-6.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326083B2A8688F70065D91A /* eberly-6.json */; };
+		5326086D2A86893E0065D91A /* empty-square.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608222A8688F60065D91A /* empty-square.json */; };
+		5326086E2A86893E0065D91A /* filtered-bridge-jhl.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608292A8688F60065D91A /* filtered-bridge-jhl.json */; };
+		5326086F2A86893E0065D91A /* hilbert.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608242A8688F60065D91A /* hilbert.json */; };
+		532608702A86893E0065D91A /* hole-touching-outer.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326081D2A8688F60065D91A /* hole-touching-outer.json */; };
+		532608712A86893E0065D91A /* hourglass.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608352A8688F60065D91A /* hourglass.json */; };
+		532608722A86893E0065D91A /* infinite-loop-jhl.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608312A8688F60065D91A /* infinite-loop-jhl.json */; };
+		532608732A86893E0065D91A /* issue16.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608372A8688F70065D91A /* issue16.json */; };
+		532608742A86893E0065D91A /* issue17.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326083C2A8688F70065D91A /* issue17.json */; };
+		532608752A86893E0065D91A /* issue29.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608322A8688F60065D91A /* issue29.json */; };
+		532608762A86893E0065D91A /* issue34.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608392A8688F70065D91A /* issue34.json */; };
+		532608772A86893E0065D91A /* issue35.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608302A8688F60065D91A /* issue35.json */; };
+		532608782A86893E0065D91A /* issue45.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608362A8688F60065D91A /* issue45.json */; };
+		532608792A86893E0065D91A /* issue52.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326082D2A8688F60065D91A /* issue52.json */; };
+		5326087A2A86893E0065D91A /* issue83.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608342A8688F60065D91A /* issue83.json */; };
+		5326087B2A86893E0065D91A /* issue107.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326083A2A8688F70065D91A /* issue107.json */; };
+		5326087C2A86893E0065D91A /* issue111.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326082A2A8688F60065D91A /* issue111.json */; };
+		5326087D2A86893E0065D91A /* issue119.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326081F2A8688F60065D91A /* issue119.json */; };
+		5326087E2A86893E0065D91A /* issue131.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608252A8688F60065D91A /* issue131.json */; };
+		5326087F2A86893E0065D91A /* issue142.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608262A8688F60065D91A /* issue142.json */; };
+		532608802A86893E0065D91A /* issue149.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608382A8688F70065D91A /* issue149.json */; };
+		532608812A86893E0065D91A /* outside-ring.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608182A8688F60065D91A /* outside-ring.json */; };
+		532608822A86893E0065D91A /* rain.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608272A8688F60065D91A /* rain.json */; };
+		532608832A86893E0065D91A /* self-touching.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608192A8688F60065D91A /* self-touching.json */; };
+		532608842A86893E0065D91A /* shared-points.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326081B2A8688F60065D91A /* shared-points.json */; };
+		532608852A86893E0065D91A /* simplified-us-border.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326082E2A8688F60065D91A /* simplified-us-border.json */; };
+		532608862A86893E0065D91A /* steiner.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326081C2A8688F60065D91A /* steiner.json */; };
+		532608872A86893E0065D91A /* touching-holes.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608232A8688F60065D91A /* touching-holes.json */; };
+		532608882A86893E0065D91A /* touching2.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608282A8688F60065D91A /* touching2.json */; };
+		532608892A86893E0065D91A /* touching3.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608202A8688F60065D91A /* touching3.json */; };
+		532608922A8689A30065D91A /* water-huge.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326088A2A8689A30065D91A /* water-huge.json */; };
+		532608932A8689A30065D91A /* water4.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326088B2A8689A30065D91A /* water4.json */; };
+		532608942A8689A30065D91A /* water2.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326088C2A8689A30065D91A /* water2.json */; };
+		532608952A8689A30065D91A /* water-huge2.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326088D2A8689A30065D91A /* water-huge2.json */; };
+		532608962A8689A30065D91A /* touching4.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326088E2A8689A30065D91A /* touching4.json */; };
+		532608972A8689A30065D91A /* water.json in Resources */ = {isa = PBXBuildFile; fileRef = 5326088F2A8689A30065D91A /* water.json */; };
+		532608982A8689A30065D91A /* water3.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608902A8689A30065D91A /* water3.json */; };
+		532608992A8689A30065D91A /* water3b.json in Resources */ = {isa = PBXBuildFile; fileRef = 532608912A8689A30065D91A /* water3b.json */; };
 		53732EEE216CF21200C2B1FB /* Earcut.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53732EE4216CF21200C2B1FB /* Earcut.framework */; };
 		53732EF3216CF21200C2B1FB /* EarcutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53732EF2216CF21200C2B1FB /* EarcutTests.swift */; };
 		53732EF5216CF21200C2B1FB /* Earcut.h in Headers */ = {isa = PBXBuildFile; fileRef = 53732EE7216CF21200C2B1FB /* Earcut.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		53732F0A216CF27300C2B1FB /* Earcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53732F09216CF27300C2B1FB /* Earcut.swift */; };
-		53732F52216CF6C200C2B1FB /* steiner.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F33216CF6C100C2B1FB /* steiner.json */; };
-		53732F53216CF6C200C2B1FB /* water2.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F34216CF6C100C2B1FB /* water2.json */; };
-		53732F54216CF6C200C2B1FB /* bad-diagonals.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F35216CF6C100C2B1FB /* bad-diagonals.json */; };
-		53732F55216CF6C200C2B1FB /* bad-hole.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F36216CF6C100C2B1FB /* bad-hole.json */; };
-		53732F56216CF6C200C2B1FB /* building.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F37216CF6C100C2B1FB /* building.json */; };
-		53732F57216CF6C200C2B1FB /* simplified-us-border.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F38216CF6C100C2B1FB /* simplified-us-border.json */; };
-		53732F58216CF6C200C2B1FB /* degenerate.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F39216CF6C100C2B1FB /* degenerate.json */; };
-		53732F59216CF6C200C2B1FB /* water3.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F3A216CF6C100C2B1FB /* water3.json */; };
-		53732F5A216CF6C200C2B1FB /* empty-square.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F3B216CF6C100C2B1FB /* empty-square.json */; };
-		53732F5B216CF6C200C2B1FB /* issue83.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F3C216CF6C100C2B1FB /* issue83.json */; };
-		53732F5C216CF6C200C2B1FB /* issue17.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F3D216CF6C100C2B1FB /* issue17.json */; };
-		53732F5D216CF6C200C2B1FB /* eberly-6.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F3E216CF6C100C2B1FB /* eberly-6.json */; };
-		53732F5E216CF6C200C2B1FB /* water-huge.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F3F216CF6C100C2B1FB /* water-huge.json */; };
-		53732F5F216CF6C200C2B1FB /* water4.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F40216CF6C100C2B1FB /* water4.json */; };
-		53732F60216CF6C200C2B1FB /* hilbert.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F41216CF6C100C2B1FB /* hilbert.json */; };
-		53732F61216CF6C200C2B1FB /* issue16.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F42216CF6C100C2B1FB /* issue16.json */; };
-		53732F62216CF6C200C2B1FB /* water.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F43216CF6C100C2B1FB /* water.json */; };
-		53732F63216CF6C200C2B1FB /* outside-ring.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F44216CF6C100C2B1FB /* outside-ring.json */; };
-		53732F64216CF6C200C2B1FB /* shared-points.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F45216CF6C100C2B1FB /* shared-points.json */; };
-		53732F65216CF6C200C2B1FB /* dude.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F46216CF6C100C2B1FB /* dude.json */; };
-		53732F66216CF6C200C2B1FB /* issue35.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F47216CF6C100C2B1FB /* issue35.json */; };
-		53732F67216CF6C200C2B1FB /* hole-touching-outer.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F48216CF6C100C2B1FB /* hole-touching-outer.json */; };
-		53732F68216CF6C200C2B1FB /* self-touching.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F49216CF6C100C2B1FB /* self-touching.json */; };
-		53732F69216CF6C200C2B1FB /* issue34.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F4A216CF6C100C2B1FB /* issue34.json */; };
-		53732F6A216CF6C200C2B1FB /* issue52.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F4B216CF6C100C2B1FB /* issue52.json */; };
-		53732F6B216CF6C200C2B1FB /* water3b.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F4C216CF6C100C2B1FB /* water3b.json */; };
-		53732F6C216CF6C200C2B1FB /* water-huge2.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F4D216CF6C100C2B1FB /* water-huge2.json */; };
-		53732F6D216CF6C200C2B1FB /* issue29.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F4E216CF6C100C2B1FB /* issue29.json */; };
-		53732F6E216CF6C200C2B1FB /* issue45.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F4F216CF6C100C2B1FB /* issue45.json */; };
-		53732F6F216CF6C200C2B1FB /* touching-holes.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F50216CF6C100C2B1FB /* touching-holes.json */; };
-		53732F70216CF6C200C2B1FB /* eberly-3.json in Resources */ = {isa = PBXBuildFile; fileRef = 53732F51216CF6C100C2B1FB /* eberly-3.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +70,52 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		532608182A8688F60065D91A /* outside-ring.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "outside-ring.json"; sourceTree = "<group>"; };
+		532608192A8688F60065D91A /* self-touching.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "self-touching.json"; sourceTree = "<group>"; };
+		5326081A2A8688F60065D91A /* eberly-3.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "eberly-3.json"; sourceTree = "<group>"; };
+		5326081B2A8688F60065D91A /* shared-points.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "shared-points.json"; sourceTree = "<group>"; };
+		5326081C2A8688F60065D91A /* steiner.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = steiner.json; sourceTree = "<group>"; };
+		5326081D2A8688F60065D91A /* hole-touching-outer.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "hole-touching-outer.json"; sourceTree = "<group>"; };
+		5326081E2A8688F60065D91A /* collinear-diagonal.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "collinear-diagonal.json"; sourceTree = "<group>"; };
+		5326081F2A8688F60065D91A /* issue119.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue119.json; sourceTree = "<group>"; };
+		532608202A8688F60065D91A /* touching3.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = touching3.json; sourceTree = "<group>"; };
+		532608212A8688F60065D91A /* degenerate.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = degenerate.json; sourceTree = "<group>"; };
+		532608222A8688F60065D91A /* empty-square.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "empty-square.json"; sourceTree = "<group>"; };
+		532608232A8688F60065D91A /* touching-holes.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "touching-holes.json"; sourceTree = "<group>"; };
+		532608242A8688F60065D91A /* hilbert.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = hilbert.json; sourceTree = "<group>"; };
+		532608252A8688F60065D91A /* issue131.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue131.json; sourceTree = "<group>"; };
+		532608262A8688F60065D91A /* issue142.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue142.json; sourceTree = "<group>"; };
+		532608272A8688F60065D91A /* rain.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = rain.json; sourceTree = "<group>"; };
+		532608282A8688F60065D91A /* touching2.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = touching2.json; sourceTree = "<group>"; };
+		532608292A8688F60065D91A /* filtered-bridge-jhl.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "filtered-bridge-jhl.json"; sourceTree = "<group>"; };
+		5326082A2A8688F60065D91A /* issue111.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue111.json; sourceTree = "<group>"; };
+		5326082B2A8688F60065D91A /* boxy.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = boxy.json; sourceTree = "<group>"; };
+		5326082C2A8688F60065D91A /* bad-hole.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "bad-hole.json"; sourceTree = "<group>"; };
+		5326082D2A8688F60065D91A /* issue52.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue52.json; sourceTree = "<group>"; };
+		5326082E2A8688F60065D91A /* simplified-us-border.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "simplified-us-border.json"; sourceTree = "<group>"; };
+		5326082F2A8688F60065D91A /* building.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = building.json; sourceTree = "<group>"; };
+		532608302A8688F60065D91A /* issue35.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue35.json; sourceTree = "<group>"; };
+		532608312A8688F60065D91A /* infinite-loop-jhl.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "infinite-loop-jhl.json"; sourceTree = "<group>"; };
+		532608322A8688F60065D91A /* issue29.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue29.json; sourceTree = "<group>"; };
+		532608332A8688F60065D91A /* bad-diagonals.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "bad-diagonals.json"; sourceTree = "<group>"; };
+		532608342A8688F60065D91A /* issue83.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue83.json; sourceTree = "<group>"; };
+		532608352A8688F60065D91A /* hourglass.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = hourglass.json; sourceTree = "<group>"; };
+		532608362A8688F60065D91A /* issue45.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue45.json; sourceTree = "<group>"; };
+		532608372A8688F70065D91A /* issue16.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue16.json; sourceTree = "<group>"; };
+		532608382A8688F70065D91A /* issue149.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue149.json; sourceTree = "<group>"; };
+		532608392A8688F70065D91A /* issue34.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue34.json; sourceTree = "<group>"; };
+		5326083A2A8688F70065D91A /* issue107.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue107.json; sourceTree = "<group>"; };
+		5326083B2A8688F70065D91A /* eberly-6.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "eberly-6.json"; sourceTree = "<group>"; };
+		5326083C2A8688F70065D91A /* issue17.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue17.json; sourceTree = "<group>"; };
+		5326083D2A8688F70065D91A /* dude.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = dude.json; sourceTree = "<group>"; };
+		5326088A2A8689A30065D91A /* water-huge.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "water-huge.json"; sourceTree = "<group>"; };
+		5326088B2A8689A30065D91A /* water4.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = water4.json; sourceTree = "<group>"; };
+		5326088C2A8689A30065D91A /* water2.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = water2.json; sourceTree = "<group>"; };
+		5326088D2A8689A30065D91A /* water-huge2.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "water-huge2.json"; sourceTree = "<group>"; };
+		5326088E2A8689A30065D91A /* touching4.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = touching4.json; sourceTree = "<group>"; };
+		5326088F2A8689A30065D91A /* water.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = water.json; sourceTree = "<group>"; };
+		532608902A8689A30065D91A /* water3.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = water3.json; sourceTree = "<group>"; };
+		532608912A8689A30065D91A /* water3b.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = water3b.json; sourceTree = "<group>"; };
 		53732EE4216CF21200C2B1FB /* Earcut.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Earcut.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		53732EE7216CF21200C2B1FB /* Earcut.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Earcut.h; sourceTree = "<group>"; };
 		53732EE8216CF21200C2B1FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -62,37 +123,6 @@
 		53732EF2216CF21200C2B1FB /* EarcutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EarcutTests.swift; sourceTree = "<group>"; };
 		53732EF4216CF21200C2B1FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		53732F09216CF27300C2B1FB /* Earcut.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Earcut.swift; sourceTree = "<group>"; };
-		53732F33216CF6C100C2B1FB /* steiner.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = steiner.json; sourceTree = "<group>"; };
-		53732F34216CF6C100C2B1FB /* water2.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = water2.json; sourceTree = "<group>"; };
-		53732F35216CF6C100C2B1FB /* bad-diagonals.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "bad-diagonals.json"; sourceTree = "<group>"; };
-		53732F36216CF6C100C2B1FB /* bad-hole.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "bad-hole.json"; sourceTree = "<group>"; };
-		53732F37216CF6C100C2B1FB /* building.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = building.json; sourceTree = "<group>"; };
-		53732F38216CF6C100C2B1FB /* simplified-us-border.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "simplified-us-border.json"; sourceTree = "<group>"; };
-		53732F39216CF6C100C2B1FB /* degenerate.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = degenerate.json; sourceTree = "<group>"; };
-		53732F3A216CF6C100C2B1FB /* water3.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = water3.json; sourceTree = "<group>"; };
-		53732F3B216CF6C100C2B1FB /* empty-square.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "empty-square.json"; sourceTree = "<group>"; };
-		53732F3C216CF6C100C2B1FB /* issue83.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue83.json; sourceTree = "<group>"; };
-		53732F3D216CF6C100C2B1FB /* issue17.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue17.json; sourceTree = "<group>"; };
-		53732F3E216CF6C100C2B1FB /* eberly-6.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "eberly-6.json"; sourceTree = "<group>"; };
-		53732F3F216CF6C100C2B1FB /* water-huge.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "water-huge.json"; sourceTree = "<group>"; };
-		53732F40216CF6C100C2B1FB /* water4.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = water4.json; sourceTree = "<group>"; };
-		53732F41216CF6C100C2B1FB /* hilbert.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = hilbert.json; sourceTree = "<group>"; };
-		53732F42216CF6C100C2B1FB /* issue16.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue16.json; sourceTree = "<group>"; };
-		53732F43216CF6C100C2B1FB /* water.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = water.json; sourceTree = "<group>"; };
-		53732F44216CF6C100C2B1FB /* outside-ring.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "outside-ring.json"; sourceTree = "<group>"; };
-		53732F45216CF6C100C2B1FB /* shared-points.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "shared-points.json"; sourceTree = "<group>"; };
-		53732F46216CF6C100C2B1FB /* dude.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = dude.json; sourceTree = "<group>"; };
-		53732F47216CF6C100C2B1FB /* issue35.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue35.json; sourceTree = "<group>"; };
-		53732F48216CF6C100C2B1FB /* hole-touching-outer.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "hole-touching-outer.json"; sourceTree = "<group>"; };
-		53732F49216CF6C100C2B1FB /* self-touching.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "self-touching.json"; sourceTree = "<group>"; };
-		53732F4A216CF6C100C2B1FB /* issue34.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue34.json; sourceTree = "<group>"; };
-		53732F4B216CF6C100C2B1FB /* issue52.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue52.json; sourceTree = "<group>"; };
-		53732F4C216CF6C100C2B1FB /* water3b.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = water3b.json; sourceTree = "<group>"; };
-		53732F4D216CF6C100C2B1FB /* water-huge2.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "water-huge2.json"; sourceTree = "<group>"; };
-		53732F4E216CF6C100C2B1FB /* issue29.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue29.json; sourceTree = "<group>"; };
-		53732F4F216CF6C100C2B1FB /* issue45.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = issue45.json; sourceTree = "<group>"; };
-		53732F50216CF6C100C2B1FB /* touching-holes.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "touching-holes.json"; sourceTree = "<group>"; };
-		53732F51216CF6C100C2B1FB /* eberly-3.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "eberly-3.json"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,37 +193,52 @@
 		53732F32216CF6C100C2B1FB /* fixtures */ = {
 			isa = PBXGroup;
 			children = (
-				53732F33216CF6C100C2B1FB /* steiner.json */,
-				53732F34216CF6C100C2B1FB /* water2.json */,
-				53732F35216CF6C100C2B1FB /* bad-diagonals.json */,
-				53732F36216CF6C100C2B1FB /* bad-hole.json */,
-				53732F37216CF6C100C2B1FB /* building.json */,
-				53732F38216CF6C100C2B1FB /* simplified-us-border.json */,
-				53732F39216CF6C100C2B1FB /* degenerate.json */,
-				53732F3A216CF6C100C2B1FB /* water3.json */,
-				53732F3B216CF6C100C2B1FB /* empty-square.json */,
-				53732F3C216CF6C100C2B1FB /* issue83.json */,
-				53732F3D216CF6C100C2B1FB /* issue17.json */,
-				53732F3E216CF6C100C2B1FB /* eberly-6.json */,
-				53732F3F216CF6C100C2B1FB /* water-huge.json */,
-				53732F40216CF6C100C2B1FB /* water4.json */,
-				53732F41216CF6C100C2B1FB /* hilbert.json */,
-				53732F42216CF6C100C2B1FB /* issue16.json */,
-				53732F43216CF6C100C2B1FB /* water.json */,
-				53732F44216CF6C100C2B1FB /* outside-ring.json */,
-				53732F45216CF6C100C2B1FB /* shared-points.json */,
-				53732F46216CF6C100C2B1FB /* dude.json */,
-				53732F47216CF6C100C2B1FB /* issue35.json */,
-				53732F48216CF6C100C2B1FB /* hole-touching-outer.json */,
-				53732F49216CF6C100C2B1FB /* self-touching.json */,
-				53732F4A216CF6C100C2B1FB /* issue34.json */,
-				53732F4B216CF6C100C2B1FB /* issue52.json */,
-				53732F4C216CF6C100C2B1FB /* water3b.json */,
-				53732F4D216CF6C100C2B1FB /* water-huge2.json */,
-				53732F4E216CF6C100C2B1FB /* issue29.json */,
-				53732F4F216CF6C100C2B1FB /* issue45.json */,
-				53732F50216CF6C100C2B1FB /* touching-holes.json */,
-				53732F51216CF6C100C2B1FB /* eberly-3.json */,
+				5326088E2A8689A30065D91A /* touching4.json */,
+				5326088A2A8689A30065D91A /* water-huge.json */,
+				5326088D2A8689A30065D91A /* water-huge2.json */,
+				5326088F2A8689A30065D91A /* water.json */,
+				5326088C2A8689A30065D91A /* water2.json */,
+				532608902A8689A30065D91A /* water3.json */,
+				532608912A8689A30065D91A /* water3b.json */,
+				5326088B2A8689A30065D91A /* water4.json */,
+				532608332A8688F60065D91A /* bad-diagonals.json */,
+				5326082C2A8688F60065D91A /* bad-hole.json */,
+				5326082B2A8688F60065D91A /* boxy.json */,
+				5326082F2A8688F60065D91A /* building.json */,
+				5326081E2A8688F60065D91A /* collinear-diagonal.json */,
+				532608212A8688F60065D91A /* degenerate.json */,
+				5326083D2A8688F70065D91A /* dude.json */,
+				5326081A2A8688F60065D91A /* eberly-3.json */,
+				5326083B2A8688F70065D91A /* eberly-6.json */,
+				532608222A8688F60065D91A /* empty-square.json */,
+				532608292A8688F60065D91A /* filtered-bridge-jhl.json */,
+				532608242A8688F60065D91A /* hilbert.json */,
+				5326081D2A8688F60065D91A /* hole-touching-outer.json */,
+				532608352A8688F60065D91A /* hourglass.json */,
+				532608312A8688F60065D91A /* infinite-loop-jhl.json */,
+				532608372A8688F70065D91A /* issue16.json */,
+				5326083C2A8688F70065D91A /* issue17.json */,
+				532608322A8688F60065D91A /* issue29.json */,
+				532608392A8688F70065D91A /* issue34.json */,
+				532608302A8688F60065D91A /* issue35.json */,
+				532608362A8688F60065D91A /* issue45.json */,
+				5326082D2A8688F60065D91A /* issue52.json */,
+				532608342A8688F60065D91A /* issue83.json */,
+				5326083A2A8688F70065D91A /* issue107.json */,
+				5326082A2A8688F60065D91A /* issue111.json */,
+				5326081F2A8688F60065D91A /* issue119.json */,
+				532608252A8688F60065D91A /* issue131.json */,
+				532608262A8688F60065D91A /* issue142.json */,
+				532608382A8688F70065D91A /* issue149.json */,
+				532608182A8688F60065D91A /* outside-ring.json */,
+				532608272A8688F60065D91A /* rain.json */,
+				532608192A8688F60065D91A /* self-touching.json */,
+				5326081B2A8688F60065D91A /* shared-points.json */,
+				5326082E2A8688F60065D91A /* simplified-us-border.json */,
+				5326081C2A8688F60065D91A /* steiner.json */,
+				532608232A8688F60065D91A /* touching-holes.json */,
+				532608282A8688F60065D91A /* touching2.json */,
+				532608202A8688F60065D91A /* touching3.json */,
 			);
 			path = fixtures;
 			sourceTree = "<group>";
@@ -254,8 +299,9 @@
 		53732EDB216CF21200C2B1FB /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1000;
-				LastUpgradeCheck = 1410;
+				LastUpgradeCheck = 1500;
 				ORGANIZATIONNAME = "Nial Giacomelli";
 				TargetAttributes = {
 					53732EE3216CF21200C2B1FB = {
@@ -299,37 +345,52 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				53732F56216CF6C200C2B1FB /* building.json in Resources */,
-				53732F59216CF6C200C2B1FB /* water3.json in Resources */,
-				53732F53216CF6C200C2B1FB /* water2.json in Resources */,
-				53732F6C216CF6C200C2B1FB /* water-huge2.json in Resources */,
-				53732F6E216CF6C200C2B1FB /* issue45.json in Resources */,
-				53732F65216CF6C200C2B1FB /* dude.json in Resources */,
-				53732F69216CF6C200C2B1FB /* issue34.json in Resources */,
-				53732F66216CF6C200C2B1FB /* issue35.json in Resources */,
-				53732F6F216CF6C200C2B1FB /* touching-holes.json in Resources */,
-				53732F6B216CF6C200C2B1FB /* water3b.json in Resources */,
-				53732F5D216CF6C200C2B1FB /* eberly-6.json in Resources */,
-				53732F70216CF6C200C2B1FB /* eberly-3.json in Resources */,
-				53732F61216CF6C200C2B1FB /* issue16.json in Resources */,
-				53732F60216CF6C200C2B1FB /* hilbert.json in Resources */,
-				53732F5F216CF6C200C2B1FB /* water4.json in Resources */,
-				53732F63216CF6C200C2B1FB /* outside-ring.json in Resources */,
-				53732F55216CF6C200C2B1FB /* bad-hole.json in Resources */,
-				53732F5A216CF6C200C2B1FB /* empty-square.json in Resources */,
-				53732F68216CF6C200C2B1FB /* self-touching.json in Resources */,
-				53732F67216CF6C200C2B1FB /* hole-touching-outer.json in Resources */,
-				53732F57216CF6C200C2B1FB /* simplified-us-border.json in Resources */,
-				53732F6A216CF6C200C2B1FB /* issue52.json in Resources */,
-				53732F62216CF6C200C2B1FB /* water.json in Resources */,
-				53732F5B216CF6C200C2B1FB /* issue83.json in Resources */,
-				53732F5C216CF6C200C2B1FB /* issue17.json in Resources */,
-				53732F5E216CF6C200C2B1FB /* water-huge.json in Resources */,
-				53732F54216CF6C200C2B1FB /* bad-diagonals.json in Resources */,
-				53732F6D216CF6C200C2B1FB /* issue29.json in Resources */,
-				53732F58216CF6C200C2B1FB /* degenerate.json in Resources */,
-				53732F64216CF6C200C2B1FB /* shared-points.json in Resources */,
-				53732F52216CF6C200C2B1FB /* steiner.json in Resources */,
+				532608992A8689A30065D91A /* water3b.json in Resources */,
+				532608642A86893E0065D91A /* bad-diagonals.json in Resources */,
+				532608652A86893E0065D91A /* bad-hole.json in Resources */,
+				532608662A86893E0065D91A /* boxy.json in Resources */,
+				532608672A86893E0065D91A /* building.json in Resources */,
+				532608682A86893E0065D91A /* collinear-diagonal.json in Resources */,
+				532608692A86893E0065D91A /* degenerate.json in Resources */,
+				5326086A2A86893E0065D91A /* dude.json in Resources */,
+				5326086B2A86893E0065D91A /* eberly-3.json in Resources */,
+				5326086C2A86893E0065D91A /* eberly-6.json in Resources */,
+				532608952A8689A30065D91A /* water-huge2.json in Resources */,
+				5326086D2A86893E0065D91A /* empty-square.json in Resources */,
+				5326086E2A86893E0065D91A /* filtered-bridge-jhl.json in Resources */,
+				5326086F2A86893E0065D91A /* hilbert.json in Resources */,
+				532608982A8689A30065D91A /* water3.json in Resources */,
+				532608702A86893E0065D91A /* hole-touching-outer.json in Resources */,
+				532608712A86893E0065D91A /* hourglass.json in Resources */,
+				532608722A86893E0065D91A /* infinite-loop-jhl.json in Resources */,
+				532608732A86893E0065D91A /* issue16.json in Resources */,
+				532608742A86893E0065D91A /* issue17.json in Resources */,
+				532608752A86893E0065D91A /* issue29.json in Resources */,
+				532608762A86893E0065D91A /* issue34.json in Resources */,
+				532608772A86893E0065D91A /* issue35.json in Resources */,
+				532608782A86893E0065D91A /* issue45.json in Resources */,
+				532608792A86893E0065D91A /* issue52.json in Resources */,
+				5326087A2A86893E0065D91A /* issue83.json in Resources */,
+				532608962A8689A30065D91A /* touching4.json in Resources */,
+				5326087B2A86893E0065D91A /* issue107.json in Resources */,
+				5326087C2A86893E0065D91A /* issue111.json in Resources */,
+				5326087D2A86893E0065D91A /* issue119.json in Resources */,
+				532608932A8689A30065D91A /* water4.json in Resources */,
+				5326087E2A86893E0065D91A /* issue131.json in Resources */,
+				5326087F2A86893E0065D91A /* issue142.json in Resources */,
+				532608802A86893E0065D91A /* issue149.json in Resources */,
+				532608812A86893E0065D91A /* outside-ring.json in Resources */,
+				532608972A8689A30065D91A /* water.json in Resources */,
+				532608942A8689A30065D91A /* water2.json in Resources */,
+				532608822A86893E0065D91A /* rain.json in Resources */,
+				532608832A86893E0065D91A /* self-touching.json in Resources */,
+				532608842A86893E0065D91A /* shared-points.json in Resources */,
+				532608852A86893E0065D91A /* simplified-us-border.json in Resources */,
+				532608862A86893E0065D91A /* steiner.json in Resources */,
+				532608922A8689A30065D91A /* water-huge.json in Resources */,
+				532608872A86893E0065D91A /* touching-holes.json in Resources */,
+				532608882A86893E0065D91A /* touching2.json in Resources */,
+				532608892A86893E0065D91A /* touching3.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -403,6 +464,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -423,6 +485,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = "debug-only";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -469,6 +532,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = s;
@@ -483,6 +547,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = "debug-only";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -501,6 +566,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = Earcut/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -510,6 +576,8 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++14";
 				PRODUCT_BUNDLE_IDENTIFIER = com.uglyapps.Earcut;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -531,6 +599,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = Earcut/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -540,6 +609,8 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++14";
 				PRODUCT_BUNDLE_IDENTIFIER = com.uglyapps.Earcut;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
