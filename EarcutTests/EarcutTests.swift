@@ -11,28 +11,24 @@ import XCTest
 class EarcutTests: XCTestCase {
 
     func testEmpty() {
-        let earcut = Earcut()
-        let result = earcut.tesselate(data: [], holeIndices: [])
+        let result = Earcut.tesselate(data: [], holeIndices: [])
         XCTAssertEqual(result, [], "Earcut of empty set failed")
     }
     
     func testIndices2D() {
-        let earcut = Earcut()
-        let result = earcut.tesselate(data: [10, 0, 0, 50, 60, 60, 70, 10])
+        let result = Earcut.tesselate(data: [10, 0, 0, 50, 60, 60, 70, 10])
         let expectedResult:[Int] = [1, 0, 3, 3, 2, 1]
         XCTAssertEqual(result, expectedResult, "Earcut of simple 2D coordinates example failed")
     }
     
     func testIndices3D() {
-        let earcut = Earcut()
-        let result = earcut.tesselate(data: [10, 0, 0, 0, 50, 0, 60, 60, 0, 70, 10, 0], dim: 3)
+        let result = Earcut.tesselate(data: [10, 0, 0, 0, 50, 0, 60, 60, 0, 70, 10, 0], dim: 3)
         let expectedResult:[Int] = [1, 0, 3, 3, 2, 1]
         XCTAssertEqual(result, expectedResult, "Earcut of simple 3D coordinates example failed")
     }
     
     func testInfiniteLoop() {
-        let earcut = Earcut()
-        let _ = earcut.tesselate(data: [1, 2, 2, 2, 1, 2, 1, 1, 1, 2, 4, 1, 5, 1, 3, 2, 4, 2, 4, 1], holeIndices: [5], dim: 3)
+        let _ = Earcut.tesselate(data: [1, 2, 2, 2, 1, 2, 1, 1, 1, 2, 4, 1, 5, 1, 3, 2, 4, 2, 4, 1], holeIndices: [5], dim: 3)
     }
     
     func areaTest(fixture:String, expectedTriangles:Int, expectedDeviation:Double=1e-14) {
@@ -42,7 +38,6 @@ class EarcutTests: XCTestCase {
             return
         }
         
-        let earcut = Earcut()
         do {
             let data = try Data(contentsOf: url)
             guard let json = try JSONSerialization.jsonObject(with: data) as? [[[Double]]] else {
@@ -50,9 +45,10 @@ class EarcutTests: XCTestCase {
                 return
             }
             
-            let flattened = earcut.flatten(data: json)
-            let indices = earcut.tesselate(data: flattened.vertices, holeIndices: flattened.holes, dim: flattened.dim)
-            let deviation = earcut.deviation(data: flattened.vertices, holeIndices: flattened.holes, dim: flattened.dim, indices: indices)
+            let flattened = Earcut.flatten(data: json)
+            
+            let indices = Earcut.tesselate(data: flattened.vertices, holeIndices: flattened.holes, dim: flattened.dim)
+            let deviation = Earcut.deviation(data: flattened.vertices, holeIndices: flattened.holes, dim: flattened.dim, indices: indices)
             if expectedTriangles > 0 {
                 XCTAssertLessThan(deviation, expectedDeviation, "Expected deviation for \(fixture).json was too high")
                 
@@ -123,7 +119,6 @@ class EarcutTests: XCTestCase {
             return
         }
         
-        let earcut = Earcut()
         do {
             let data = try Data(contentsOf: url)
             guard let json = try JSONSerialization.jsonObject(with: data) as? [[[Double]]] else {
@@ -131,12 +126,12 @@ class EarcutTests: XCTestCase {
                 return
             }
             
-            let flattened = earcut.flatten(data: json)
+            let flattened = Earcut.flatten(data: json)
             
             let start = CACurrentMediaTime()
             var ops:Int = 0
             while(CACurrentMediaTime() - start < 1) {
-                let _ = earcut.tesselate(data: flattened.vertices, holeIndices: flattened.holes, dim: flattened.dim)
+                let _ = Earcut.tesselate(data: flattened.vertices, holeIndices: flattened.holes, dim: flattened.dim)
                 ops += 1
             }
             
