@@ -1,4 +1,4 @@
-# Earcut.swift
+# SwiftEarcut
 A Swift port of Mapbox's [earcut.js](https://github.com/mapbox/earcut) polygon triangulation library.
 
 ## Usage
