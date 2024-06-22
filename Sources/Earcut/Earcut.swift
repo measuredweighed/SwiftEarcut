@@ -45,7 +45,7 @@ final class Node : Equatable {
 
 /**
  The earcut process doesn't seem to clean-up the `Node`'s generated during
- the tesselation process. As such, I've adopted the solution used in
+ the tessellation process. As such, I've adopted the solution used in
  Mapbox's own C++ port of earcut, which is to have an allocator keep
  track of all Node instances and then wipe them out at the end of the process
  */
@@ -70,7 +70,7 @@ final class NodeAllocator {
 }
 
 final public class Earcut {
-    public static func tesselate(data:[Double], holeIndices:[Int] = [], dim:Int = 2) -> [Int] {
+    public static func tessellate(data:[Double], holeIndices:[Int] = [], dim:Int = 2) -> [Int] {
         var triangles:[Int] = [Int]()
         guard data.count > 0 else { return triangles }
         

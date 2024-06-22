@@ -9,26 +9,26 @@ import XCTest
 @testable import Earcut
 
 class EarcutTests: XCTestCase {
-
+    
     func testEmpty() {
-        let result = Earcut.tesselate(data: [], holeIndices: [])
+        let result = Earcut.tessellate(data: [], holeIndices: [])
         XCTAssertEqual(result, [], "Earcut of empty set failed")
     }
     
     func testIndices2D() {
-        let result = Earcut.tesselate(data: [10, 0, 0, 50, 60, 60, 70, 10])
+        let result = Earcut.tessellate(data: [10, 0, 0, 50, 60, 60, 70, 10])
         let expectedResult:[Int] = [1, 0, 3, 3, 2, 1]
         XCTAssertEqual(result, expectedResult, "Earcut of simple 2D coordinates example failed")
     }
     
     func testIndices3D() {
-        let result = Earcut.tesselate(data: [10, 0, 0, 0, 50, 0, 60, 60, 0, 70, 10, 0], dim: 3)
+        let result = Earcut.tessellate(data: [10, 0, 0, 0, 50, 0, 60, 60, 0, 70, 10, 0], dim: 3)
         let expectedResult:[Int] = [1, 0, 3, 3, 2, 1]
         XCTAssertEqual(result, expectedResult, "Earcut of simple 3D coordinates example failed")
     }
     
     func testInfiniteLoop() {
-        let _ = Earcut.tesselate(data: [1, 2, 2, 2, 1, 2, 1, 1, 1, 2, 4, 1, 5, 1, 3, 2, 4, 2, 4, 1], holeIndices: [5], dim: 3)
+        let _ = Earcut.tessellate(data: [1, 2, 2, 2, 1, 2, 1, 1, 1, 2, 4, 1, 5, 1, 3, 2, 4, 2, 4, 1], holeIndices: [5], dim: 3)
     }
     
     func areaTest(fixture:String, expectedTriangles:Int, expectedDeviation:Double=1e-14) {
@@ -46,7 +46,7 @@ class EarcutTests: XCTestCase {
             
             let flattened = Earcut.flatten(data: json)
             
-            let indices = Earcut.tesselate(data: flattened.vertices, holeIndices: flattened.holes, dim: flattened.dim)
+            let indices = Earcut.tessellate(data: flattened.vertices, holeIndices: flattened.holes, dim: flattened.dim)
             let deviation = Earcut.deviation(data: flattened.vertices, holeIndices: flattened.holes, dim: flattened.dim, indices: indices)
             if expectedTriangles > 0 {
                 XCTAssertLessThan(deviation, expectedDeviation, "Expected deviation for \(fixture).json was too high")
@@ -129,7 +129,7 @@ class EarcutTests: XCTestCase {
             let start = CACurrentMediaTime()
             var ops:Int = 0
             while(CACurrentMediaTime() - start < 1) {
-                let _ = Earcut.tesselate(data: flattened.vertices, holeIndices: flattened.holes, dim: flattened.dim)
+                let _ = Earcut.tessellate(data: flattened.vertices, holeIndices: flattened.holes, dim: flattened.dim)
                 ops += 1
             }
             
@@ -141,5 +141,5 @@ class EarcutTests: XCTestCase {
             return
         }
     }
-
+    
 }
