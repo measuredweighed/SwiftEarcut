@@ -32,8 +32,7 @@ class EarcutTests: XCTestCase {
     }
     
     func areaTest(fixture:String, expectedTriangles:Int, expectedDeviation:Double=1e-14) {
-        let bundle = Bundle(for: type(of: self))
-        guard let url = bundle.url(forResource: fixture, withExtension: "json") else {
+        guard let url = Bundle.module.url(forResource: fixture, withExtension: "json", subdirectory: "fixtures") else {
             XCTFail("Missing file: \(fixture).json")
             return
         }
@@ -113,8 +112,7 @@ class EarcutTests: XCTestCase {
     func testOpsPerSec() {
         
         let fixture:String = "water"
-        let bundle = Bundle(for: type(of: self))
-        guard let url = bundle.url(forResource: fixture, withExtension: "json") else {
+        guard let url = Bundle.module.url(forResource: fixture, withExtension: "json", subdirectory: "fixtures") else {
             XCTFail("Missing file: \(fixture).json")
             return
         }
