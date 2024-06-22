@@ -68,8 +68,32 @@ fileprivate final class NodeAllocator {
     }
 }
 
+
+/// A Swift port of Mapbox's [earcut.js](https://github.com/mapbox/earcut) polygon triangulation library.
 final public class Earcut {
-    public static func tessellate(data:[Double], holeIndices:[Int] = [], dim:Int = 2) -> [Int] {
+    
+    /**
+     Returns the indices of the points shaping the triangles.
+     - Parameter data: Vertices is a flat array of vertex coordinates like [x0,y0, x1,y1, x2,y2, ...].
+     - Parameter holeIndices: if any (e.g. [5, 8] for a 12-vertex input would mean one hole with vertices 5–7 and another with 8–11).
+     - Parameter dim: Number of coordinates per vertex in the input array (2 by default). Only two are used for triangulation (x and y), and the rest are ignored.
+     - Returns: Array of point indices, where each group of three vertex indices forms a triangle.
+     - Warning: Earcut is a 2D triangulation algorithm, and **handles 3D data as if it was projected onto the XY plane** (with Z component ignored).
+     # Note #
+     Whether the outer ring or the holes are closed (identical first and last corner point) does not have to be considered (see example).
+     # Example #
+     ```swift
+     Earcut.tessellate(vertices: [
+            0.0,0.0,0.0, 9.0,0.0,0.0, 6.0,8.0,0.0, 5.0,3.0,0.0, 2.0,8.0,0.0, 0.0,8.0,0.0,
+            6.0,2.0,0.0, 7.0,1.0,0.0, 7.0,3.0,0.0, 6.0,3.0,0.0, 5.0,2.0,0.0, 6.0,2.0,0.0,
+        ],
+        holeIndices: [6],
+        dim: 3
+     )
+     // returns [0,10,9, 7,11,10, 3,4,5, 7,10,0, 3,5,0, 7,0,1, 3,0,9, 8,7,1, 2,3,9, 8,1,2, 2,9,8]
+     ```
+     */
+    public static func tessellate(data:[Double], holeIndices: [Int] = [], dim:Int = 2) -> [Int] {
         var triangles:[Int] = [Int]()
         guard data.count > 0 else { return triangles }
         
@@ -128,6 +152,22 @@ final public class Earcut {
         return triangles
     }
     
+    /**
+     Converts a multi-dimensional array of vertices (e.g. GeoJSON Polygon) to the format expected by the ``tessellate(data:holeIndices:dim:)`` method. Returns (1) flattened array of Doubles with the vertices coordinate components, (2) indices of potential holes in the polygon, and  (3) the coordinate's dimension.
+     - Parameter data:Multi-dimensional array with vertices, like [[exterior],[hole0],[hole1]] and [[[x0,y0,z0],[x1,y1,z1],[x2,y2,z2]],[[x3,y3,z3],[x4,y4,z4],[x5,y5,z5]], ...]
+     - Returns: `vertices`: Array of double values containing the coordinate components of all vertices. `holes`: Indices of the polygon's holes, if any. `dim`: Number of coordinates per vertex.
+     # Example #
+     ```swift
+     Earcut.flatten(data: [
+            [[0.0,0.0,0.0], [9.0,0.0,0.0], ... ],
+            [[6.0,2.0,0.0], [7.0,1.0,0.0], ... ],
+        ]
+     )
+     // vertices: 0.0,0.0,0.0, 9.0,0.0,0.0, ... 6.0,2.0,0.0, 7.0,1.0,0.0, ...
+     // holes: [6]
+     // dim: 3
+     ```
+     */
     public static func flatten(data:[[[Double]]]) -> (vertices:[Double], holes:[Int], dim:Int) {
         let dim = data[0][0].count
         
@@ -148,8 +188,14 @@ final public class Earcut {
         return result
     }
     
-    // return a percentage difference between the polygon area and its triangulation area;
-    // used to verify correctness of triangulation
+    /**
+     Returns the relative difference between the total area of triangles and the area of the input polygon, used to verify correctness of triangulation.
+     - Parameter data:Multi-dimensional array with vertices, like [[exterior],[hole0],[hole1]] and [[[x0,y0,z0],[x1,y1,z1],[x2,y2,z2]],[[x3,y3,z3],[x4,y4,z4],[x5,y5,z5]], ...]
+     - Parameter holeIndices: If any (e.g. [5, 8] for a 12-vertex input would mean one hole with vertices 5–7 and another with 8–11).
+     - Parameter dim: Number of coordinates per vertex in the input array (2 by default). Only two are used for triangulation (x and y), and the rest are ignored.
+     - Parameter indices: Array of point indices by the ``tessellate(data:holeIndices:dim:)`` method to validate.
+     - Returns: Percentage difference between the polygon area and its triangulation area. 0 means the triangulation is fully correct.
+     */
     public static func deviation(data:[Double], holeIndices:[Int] = [], dim:Int=2, indices:[Int]) -> Double {
         let hasHoles:Bool = holeIndices.count > 0
         let outerLen:Int = hasHoles ? holeIndices[0] * dim : data.count
