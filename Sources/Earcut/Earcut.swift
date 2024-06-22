@@ -10,7 +10,7 @@
 
 import Foundation
 
-final class Node : Equatable {
+fileprivate final class Node : Equatable {
     // vertex index in coord array
     let i:Int
     
@@ -49,7 +49,7 @@ final class Node : Equatable {
  Mapbox's own C++ port of earcut, which is to have an allocator keep
  track of all Node instances and then wipe them out at the end of the process
  */
-final class NodeAllocator {
+fileprivate final class NodeAllocator {
     private var nodes:[Node] = [Node]()
     
     public func create(i:Int, x:Double, y:Double) -> Node {
