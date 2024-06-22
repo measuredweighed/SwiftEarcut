@@ -1,11 +1,10 @@
+// Copyright © 2018 measuredweighed. All rights reserved.
+// Use of this source code is governed by MIT and ISC licenses (mapbox).
+// The LICENSE files are distributed with this software package.
 //
-//  Earcut.swift
-//  Earcut
+// A Swift Earcut port of Mapbox's earcut.js
+// https://github.com/mapbox/earcut
 //
-//  A Swift Earcut port of Mapbox's earcut.js
-//  https://github.com/mapbox/earcut
-//
-//  Copyright © 2018 measuredweighed. All rights reserved.
 //
 
 import Foundation
