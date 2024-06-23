@@ -14,15 +14,15 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "Earcut",
-            targets: ["Earcut"]),
+            name: "SwiftEarcut",
+            targets: ["SwiftEarcut"]),
     ],
     targets: [
         .target(
-            name: "Earcut"),
+            name: "SwiftEarcut"),
         .testTarget(
-            name: "EarcutTests",
-            dependencies: ["Earcut"],
+            name: "SwiftEarcutTests",
+            dependencies: ["SwiftEarcut"],
             resources: [
                 .copy("fixtures/")
             ]
