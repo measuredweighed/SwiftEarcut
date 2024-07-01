@@ -18,7 +18,7 @@ Mapbox's [earcut.js](https://github.com/mapbox/earcut) is governed by an [ISC li
 ### Swift Package Manager
 Add the following dependency
 ```swift
-.package(url: "https://github.com/measuredweighed/SwiftEarcut.git", from: "2.2.4"),
+.package(url: "https://github.com/measuredweighed/SwiftEarcut.git", from: "1.0.0"),
 ```
 
 ## Documentation
