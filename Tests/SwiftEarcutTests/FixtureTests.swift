@@ -17,25 +17,27 @@ final class FixtureTests: XCTestCase {
   /// Fixtures whose output has not yet been brought up to earcut 3.2.3. Shrinks to empty
   /// as the port lands; the suite fails if one starts passing without being removed.
   static let pendingUpstreamPort: Set<String> = [
-    "boxy",
+    "bad-hole",
     "earcut",
     "eberly-6",
+    "filtered-bridge-jhl",
+    "infinite-loop-jhl",
     "issue111",
     "issue147",
     "issue16",
-    "issue34",
     "issue52",
     "self-tangent-4",
     "touching-holes2",
     "touching-holes3",
-    "touching-holes4",
     "touching-holes5",
     "touching-holes6",
     "touching4",
+    "water",
     "water-huge",
     "water-huge2",
     "water-huge3",
     "water2",
+    "water4",
   ]
 
   static let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()

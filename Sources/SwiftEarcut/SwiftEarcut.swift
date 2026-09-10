@@ -74,7 +74,7 @@ public enum Earcut {
       invSize = invSize != 0 ? 32767 / invSize : 0
     }
 
-    earcutLinked(&nodes, outerNode, &triangles, minX, minY, invSize, 0, steiners)
+    earcutLinked(&nodes, outerNode, &triangles, minX, minY, invSize, steiners)
 
     return triangles
   }
@@ -217,36 +217,40 @@ private func isSteiner(_ steiners: [Int32], _ p: Int32) -> Bool {
   steiners.isEmpty ? false : steiners.contains(p)
 }
 
-/// eliminate colinear or duplicate points
+/// Sweeps the whole ring to a fixpoint when `end == start`, otherwise heals only the
+/// window up to `end`. Reports whether anything was removed, which drives the retry ladder.
 private func filterPoints(
   _ n: UnsafeMutablePointer<Node>,
   _ start: Int32,
   _ end: Int32,
   _ steiners: [Int32])
-  -> Int32
+  -> (end: Int32, removed: Bool)
 {
+  let full = end == start
   var end = end
   var p = start
   var again = false
+  var removed = false
+
   repeat {
     again = false
+    let next = n[Int(p)].next
 
-    if !isSteiner(steiners, p),
-       equals(n, p, n[Int(p)].next) || area(n, n[Int(p)].prev, p, n[Int(p)].next) == 0
+    if p != next, !isSteiner(steiners, p),
+       equals(n, p, next) || area(n, n[Int(p)].prev, p, next) == 0
     {
+      if full || p == end { end = n[Int(p)].prev }
+      removed = true
       removeNode(n, p)
-      end = n[Int(p)].prev
       p = n[Int(p)].prev
-
-      if p == n[Int(p)].next { break }
       again = true
-    } else {
-      p = n[Int(p)].next
+    } else if full || p != end {
+      p = next
+      again = !full
     }
-
   } while again || p != end
 
-  return end
+  return (end, removed)
 }
 
 // MARK: - Ear slicing
@@ -258,32 +262,30 @@ private func earcutLinked(
   _ minX: Double,
   _ minY: Double,
   _ invSize: Double,
-  _ pass: Int,
   _ steiners: [Int32])
 {
   var ear = ear
   let n = nodes.base
 
-  if pass == 0, invSize > 0 {
-    indexCurve(n, ear, minX, minY, invSize)
-  }
+  if invSize > 0 { indexCurve(n, ear, minX, minY, invSize) }
 
   var stop = ear
+  var cured = false
 
   while n[Int(ear)].prev != n[Int(ear)].next {
     let prev = n[Int(ear)].prev
     let next = n[Int(ear)].next
 
-    if invSize > 0 ? isEarHashed(n, ear, minX, minY, invSize) : isEar(n, ear) {
+    if area(n, prev, ear, next) < 0,
+       invSize > 0 ? isEarHashed(n, ear, minX, minY, invSize) : isEar(n, ear)
+    {
       triangles.append(Int(n[Int(prev)].i))
       triangles.append(Int(n[Int(ear)].i))
       triangles.append(Int(n[Int(next)].i))
 
       removeNode(n, ear)
-
-      // skipping the next vertice leads to less sliver triangles
-      ear = n[Int(next)].next
-      stop = n[Int(next)].next
+      ear = next
+      stop = next
 
       continue
     }
@@ -292,16 +294,22 @@ private func earcutLinked(
 
     // if we looped through the whole remaining polygon and can't find any more ears
     if ear == stop {
-      // `n` is dead below this point: every branch may reserve, and each one breaks out.
-      if pass == 0 {
-        earcutLinked(&nodes, filterPoints(n, ear, ear, steiners), &triangles, minX, minY, invSize, 1, steiners)
-      } else if pass == 1 {
-        ear = cureLocalIntersections(n, filterPoints(n, ear, ear, steiners), &triangles, steiners)
-        earcutLinked(&nodes, ear, &triangles, minX, minY, invSize, 2, steiners)
-      } else if pass == 2 {
-        splitEarcut(&nodes, ear, &triangles, minX, minY, invSize, steiners)
+      let filtered = filterPoints(n, ear, ear, steiners)
+      ear = filtered.end
+      if filtered.removed {
+        stop = ear
+        continue
       }
 
+      if !cured {
+        ear = cureLocalIntersections(n, ear, &triangles, steiners)
+        stop = ear
+        cured = true
+        continue
+      }
+
+      // `n` is dead below this point: splitEarcut reserves.
+      splitEarcut(&nodes, ear, &triangles, minX, minY, invSize, steiners)
       break
     }
   }
@@ -311,8 +319,6 @@ private func isEar(_ n: UnsafeMutablePointer<Node>, _ ear: Int32) -> Bool {
   let a = n[Int(ear)].prev
   let b = ear
   let c = n[Int(ear)].next
-
-  if area(n, a, b, c) >= 0 { return false } // reflex, can't be an ear
 
   let ax = n[Int(a)].x, bx = n[Int(b)].x, cx = n[Int(c)].x
   let ay = n[Int(a)].y, by = n[Int(b)].y, cy = n[Int(c)].y
@@ -325,8 +331,9 @@ private func isEar(_ n: UnsafeMutablePointer<Node>, _ ear: Int32) -> Bool {
 
   var p = n[Int(c)].next
   while p != a {
-    if n[Int(p)].x >= x0, n[Int(p)].x <= x1, n[Int(p)].y >= y0, n[Int(p)].y <= y1,
-       pointInTriangle(ax, ay, bx, by, cx, cy, n[Int(p)].x, n[Int(p)].y),
+    let px = n[Int(p)].x, py = n[Int(p)].y
+    if px >= x0, px <= x1, py >= y0, py <= y1, !(ax == px && ay == py),
+       pointInTriangle(ax, ay, bx, by, cx, cy, px, py),
        area(n, n[Int(p)].prev, p, n[Int(p)].next) >= 0 { return false }
     p = n[Int(p)].next
   }
@@ -346,8 +353,6 @@ private func isEarHashed(
   let b = ear
   let c = n[Int(ear)].next
 
-  if area(n, a, b, c) >= 0 { return false } // reflex, can't be an ear
-
   let ax = n[Int(a)].x, bx = n[Int(b)].x, cx = n[Int(c)].x
   let ay = n[Int(a)].y, by = n[Int(b)].y, cy = n[Int(c)].y
 
@@ -360,33 +365,19 @@ private func isEarHashed(
   let maxZ = zOrder(x1, y1, minX, minY, invSize)
 
   var p = n[Int(ear)].prevZ
-  var q = n[Int(ear)].nextZ
-
-  // look for points inside the triangle in both directions
-  while p >= 0, n[Int(p)].z >= minZ, q >= 0, n[Int(q)].z <= maxZ {
-    if n[Int(p)].x >= x0, n[Int(p)].x <= x1, n[Int(p)].y >= y0, n[Int(p)].y <= y1, p != a, p != c,
-       pointInTriangle(ax, ay, bx, by, cx, cy, n[Int(p)].x, n[Int(p)].y),
-       area(n, n[Int(p)].prev, p, n[Int(p)].next) >= 0 { return false }
-    p = n[Int(p)].prevZ
-
-    if n[Int(q)].x >= x0, n[Int(q)].x <= x1, n[Int(q)].y >= y0, n[Int(q)].y <= y1, q != a, q != c,
-       pointInTriangle(ax, ay, bx, by, cx, cy, n[Int(q)].x, n[Int(q)].y),
-       area(n, n[Int(q)].prev, q, n[Int(q)].next) >= 0 { return false }
-    q = n[Int(q)].nextZ
-  }
-
-  // look for remaining points in decreasing z-order
   while p >= 0, n[Int(p)].z >= minZ {
-    if n[Int(p)].x >= x0, n[Int(p)].x <= x1, n[Int(p)].y >= y0, n[Int(p)].y <= y1, p != a, p != c,
-       pointInTriangle(ax, ay, bx, by, cx, cy, n[Int(p)].x, n[Int(p)].y),
+    let px = n[Int(p)].x, py = n[Int(p)].y
+    if px >= x0, px <= x1, py >= y0, py <= y1, p != c, !(ax == px && ay == py),
+       pointInTriangle(ax, ay, bx, by, cx, cy, px, py),
        area(n, n[Int(p)].prev, p, n[Int(p)].next) >= 0 { return false }
     p = n[Int(p)].prevZ
   }
 
-  // look for remaining points in increasing z-order
+  var q = n[Int(ear)].nextZ
   while q >= 0, n[Int(q)].z <= maxZ {
-    if n[Int(q)].x >= x0, n[Int(q)].x <= x1, n[Int(q)].y >= y0, n[Int(q)].y <= y1, q != a, q != c,
-       pointInTriangle(ax, ay, bx, by, cx, cy, n[Int(q)].x, n[Int(q)].y),
+    let qx = n[Int(q)].x, qy = n[Int(q)].y
+    if qx >= x0, qx <= x1, qy >= y0, qy <= y1, q != c, !(ax == qx && ay == qy),
+       pointInTriangle(ax, ay, bx, by, cx, cy, qx, qy),
        area(n, n[Int(q)].prev, q, n[Int(q)].next) >= 0 { return false }
     q = n[Int(q)].nextZ
   }
@@ -422,7 +413,7 @@ private func cureLocalIntersections(
     p = n[Int(p)].next
   } while p != start
 
-  return filterPoints(n, p, p, steiners)
+  return filterPoints(n, p, p, steiners).end
 }
 
 /// try splitting polygon into two and triangulate them independently
@@ -446,12 +437,12 @@ private func splitEarcut(
       if n[Int(a)].i != n[Int(b)].i, isValidDiagonal(n, a, b) {
         var c = splitPolygon(&nodes, a, b)
 
-        a = filterPoints(n, a, n[Int(a)].next, steiners)
-        c = filterPoints(n, c, n[Int(c)].next, steiners)
+        a = filterPoints(n, a, n[Int(a)].next, steiners).end
+        c = filterPoints(n, c, n[Int(c)].next, steiners).end
 
         // `n` is dead below this point: earcutLinked may reserve.
-        earcutLinked(&nodes, a, &triangles, minX, minY, invSize, 0, steiners)
-        earcutLinked(&nodes, c, &triangles, minX, minY, invSize, 0, steiners)
+        earcutLinked(&nodes, a, &triangles, minX, minY, invSize, steiners)
+        earcutLinked(&nodes, c, &triangles, minX, minY, invSize, steiners)
         return
       }
       b = n[Int(b)].next
@@ -510,7 +501,7 @@ private func eliminateHole(
   let n = nodes.base
 
   _ = filterPoints(n, bridgeReverse, n[Int(bridgeReverse)].next, steiners)
-  return filterPoints(n, bridge, n[Int(bridge)].next, steiners)
+  return filterPoints(n, bridge, n[Int(bridge)].next, steiners).end
 }
 
 /// David Eberly's algorithm for finding a bridge between hole and outer polygon
@@ -584,7 +575,7 @@ private func indexCurve(
 {
   var p = start
   repeat {
-    if n[Int(p)].z == 0 { n[Int(p)].z = zOrder(n[Int(p)].x, n[Int(p)].y, minX, minY, invSize) }
+    n[Int(p)].z = zOrder(n[Int(p)].x, n[Int(p)].y, minX, minY, invSize)
     n[Int(p)].prevZ = n[Int(p)].prev
     n[Int(p)].nextZ = n[Int(p)].next
     p = n[Int(p)].next
