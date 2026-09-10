@@ -137,7 +137,16 @@ public enum Earcut {
           (data[a] - data[b]) * (data[c + 1] - data[a + 1]))
     }
 
-    return polygonArea == 0 && trianglesArea == 0 ? 0 : abs((trianglesArea - polygonArea) / polygonArea)
+    // with no triangles, a polygon area within shoelace roundoff of zero - which scales with
+    // the squared coordinate magnitude - means the input was degenerate, not mistriangulated
+    if trianglesArea == 0 {
+      var maximum: Double = 0
+      for i in stride(from: 0, to: data.count, by: dim) {
+        maximum = max(maximum, abs(data[i]), abs(data[i + 1]))
+      }
+      return abs(polygonArea) <= Double(data.count) * maximum * maximum * .ulpOfOne ? 0 : 1
+    }
+    return abs((trianglesArea - polygonArea) / polygonArea)
   }
 }
 
