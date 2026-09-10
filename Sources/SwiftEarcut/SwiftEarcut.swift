@@ -43,6 +43,9 @@ public enum Earcut {
     defer { nodes.deallocate() }
     var scratch = Scratch()
     defer { scratch.deallocate() }
+    let blocks = UnsafeMutablePointer<BlockIndex>.allocate(capacity: 1)
+    blocks.initialize(to: BlockIndex())
+    defer { blocks.pointee.deallocate(); blocks.deallocate() }
     var steiners = [Int32]()
 
     var outerNode = linkedList(&nodes, data, 0, outerLen, dim, true)
@@ -53,7 +56,7 @@ public enum Earcut {
     var invSize: Double = 0
 
     if hasHoles {
-      outerNode = eliminateHoles(&nodes, data, holeIndices, outerNode, dim, &steiners)
+      outerNode = eliminateHoles(&nodes, data, holeIndices, outerNode, dim, &steiners, blocks)
     }
 
     // if the shape is not too simple, we'll use z-order curve hash later; calculate polygon bbox
@@ -191,12 +194,17 @@ private func insertNode(_ nodes: inout Nodes, _ i: UInt32, _ x: Double, _ y: Dou
 }
 
 @inline(__always)
-private func removeNode(_ n: UnsafeMutablePointer<Node>, _ p: Int32) {
+private func removeNode(
+  _ n: UnsafeMutablePointer<Node>,
+  _ p: Int32,
+  _ blocks: UnsafeMutablePointer<BlockIndex>? = nil)
+{
   let node = n[Int(p)]
   if node.next >= 0 { n[Int(node.next)].prev = node.prev }
   if node.prev >= 0 { n[Int(node.prev)].next = node.next }
   if node.prevZ >= 0 { n[Int(node.prevZ)].nextZ = node.nextZ }
   if node.nextZ >= 0 { n[Int(node.nextZ)].prevZ = node.prevZ }
+  blocks?.pointee.grow(n, head: node.prev, tail: node.next)
 }
 
 private func getLeftmost(_ n: UnsafeMutablePointer<Node>, _ start: Int32) -> Int32 {
@@ -225,7 +233,8 @@ private func filterPoints(
   _ n: UnsafeMutablePointer<Node>,
   _ start: Int32,
   _ end: Int32,
-  _ steiners: [Int32])
+  _ steiners: [Int32],
+  _ blocks: UnsafeMutablePointer<BlockIndex>? = nil)
   -> (end: Int32, removed: Bool)
 {
   let full = end == start
@@ -243,7 +252,7 @@ private func filterPoints(
     {
       if full || p == end { end = n[Int(p)].prev }
       removed = true
-      removeNode(n, p)
+      removeNode(n, p, blocks)
       p = n[Int(p)].prev
       again = true
     } else if full || p != end {
@@ -464,17 +473,45 @@ private func splitEarcut(
 
 // MARK: - Holes
 
+private struct HoleKey: Comparable {
+  let node: Int32
+  let x: Double
+  let y: Double
+  let slope: Double
+  let order: Int32
+
+  init(_ n: UnsafeMutablePointer<Node>, _ node: Int32, _ order: Int32) {
+    let next = n[Int(node)].next
+    let x = n[Int(node)].x
+    let y = n[Int(node)].y
+    let slope = (n[Int(next)].y - y) / (n[Int(next)].x - x)
+    self.node = node
+    self.x = x
+    self.y = y
+    self.slope = slope.isNaN ? 0 : slope
+    self.order = order
+  }
+
+  static func < (a: HoleKey, b: HoleKey) -> Bool {
+    if a.x != b.x { return a.x < b.x }
+    if a.y != b.y { return a.y < b.y }
+    if a.slope != b.slope { return a.slope < b.slope }
+    return a.order < b.order
+  }
+}
+
 private func eliminateHoles(
   _ nodes: inout Nodes,
   _ data: [Double],
   _ holeIndices: [Int],
   _ outerNode: Int32,
   _ dim: Int,
-  _ steiners: inout [Int32])
+  _ steiners: inout [Int32],
+  _ blocks: UnsafeMutablePointer<BlockIndex>)
   -> Int32
 {
   var outerNode = outerNode
-  var queue = [Int32]()
+  var queue = [HoleKey]()
   let len = holeIndices.count
 
   for i in 0 ..< len {
@@ -482,91 +519,130 @@ private func eliminateHoles(
     let end = i < len - 1 ? holeIndices[i + 1] * dim : data.count
     let list = linkedList(&nodes, data, start, end, dim, false)
     guard list >= 0 else { continue }
-    if list == nodes.base[Int(list)].next {
-      steiners.append(list)
-    }
-    queue.append(getLeftmost(nodes.base, list))
+
+    let n = nodes.base
+    if list == n[Int(list)].next { steiners.append(list) }
+    queue.append(HoleKey(n, getLeftmost(n, list), Int32(queue.count)))
   }
 
-  let n = nodes.base
-  queue.sort { n[Int($0)].x < n[Int($1)].x }
+  queue.sort()
 
-  // process holes left to right
-  for item in queue { outerNode = eliminateHole(&nodes, item, outerNode, steiners) }
+  blocks.pointee.reset(maxNodes: Int32(data.count / dim), holes: Int32(len))
+  blocks.pointee.indexSegment(nodes.base, outerNode, outerNode)
 
-  return outerNode
+  for key in queue {
+    outerNode = eliminateHole(&nodes, key.node, outerNode, steiners, blocks)
+  }
+
+  return filterPoints(nodes.base, outerNode, outerNode, steiners).end
 }
 
 private func eliminateHole(
   _ nodes: inout Nodes,
   _ hole: Int32,
   _ outerNode: Int32,
-  _ steiners: [Int32])
+  _ steiners: [Int32],
+  _ blocks: UnsafeMutablePointer<BlockIndex>)
   -> Int32
 {
-  let bridge = findHoleBridge(nodes.base, hole, outerNode)
+  let bridge = findHoleBridge(nodes.base, hole, outerNode, blocks)
   guard bridge >= 0 else { return outerNode }
 
   nodes.reserve(2)
   let bridgeReverse = splitPolygon(&nodes, bridge, hole)
   let n = nodes.base
 
-  _ = filterPoints(n, bridgeReverse, n[Int(bridgeReverse)].next, steiners)
-  return filterPoints(n, bridge, n[Int(bridge)].next, steiners).end
+  // in ring order the splice runs bridge -> hole -> bridgeReverse -> bridge2 -> bridge's
+  // old next, so this covers the hole's edges and both new slit edges
+  let bridge2 = n[Int(bridgeReverse)].next
+  blocks.pointee.indexSegment(n, bridge, n[Int(bridge2)].next)
+
+  _ = filterPoints(n, bridgeReverse, n[Int(bridgeReverse)].next, steiners, blocks)
+  return filterPoints(n, bridge, n[Int(bridge)].next, steiners, blocks).end
 }
 
 /// David Eberly's algorithm for finding a bridge between hole and outer polygon
-private func findHoleBridge(_ n: UnsafeMutablePointer<Node>, _ hole: Int32, _ outerNode: Int32) -> Int32 {
-  var p = outerNode
+private func findHoleBridge(
+  _ n: UnsafeMutablePointer<Node>,
+  _ hole: Int32,
+  _ outerNode: Int32,
+  _ blocks: UnsafeMutablePointer<BlockIndex>)
+  -> Int32
+{
   let hx = n[Int(hole)].x
   let hy = n[Int(hole)].y
   var qx = -Double.infinity
   var m: Int32 = -1
 
-  repeat {
-    let next = n[Int(p)].next
-    if hy <= n[Int(p)].y, hy >= n[Int(next)].y, n[Int(next)].y != n[Int(p)].y {
-      let x = n[Int(p)].x + (hy - n[Int(p)].y) * (n[Int(next)].x - n[Int(p)].x) / (n[Int(next)].y - n[Int(p)].y)
-      if x <= hx, x > qx {
-        qx = x
-        m = n[Int(p)].x < n[Int(next)].x ? p : next
+  if equals(n, hole, outerNode) { return outerNode }
 
-        // hole touches outer segment; pick leftmost endpoint
-        if x == hx { return m }
+  // find a segment intersected by a ray from the hole's leftmost point to the left;
+  // segment's endpoint with lesser x will be potential connection point
+  for block in 0 ..< blocks.pointee.count {
+    let bounds = blocks.pointee.box(block)
+    if hy < bounds.minY || hy > bounds.maxY || bounds.minX > hx || bounds.maxX <= qx { continue }
+
+    let stop = blocks.pointee.liveStop(n, block)
+    var p = blocks.pointee.liveHead(n, block)
+    repeat {
+      if n[Int(n[Int(p)].prev)].next == p {
+        let next = n[Int(p)].next
+        if equals(n, hole, next) { return next }
+        if hy <= n[Int(p)].y, hy >= n[Int(next)].y, n[Int(next)].y != n[Int(p)].y {
+          let x = n[Int(p)].x
+            + (hy - n[Int(p)].y) * (n[Int(next)].x - n[Int(p)].x) / (n[Int(next)].y - n[Int(p)].y)
+          if x <= hx, x > qx {
+            qx = x
+            m = n[Int(p)].x < n[Int(next)].x ? p : next
+
+            // hole touches outer segment; pick leftmost endpoint
+            if x == hx { return m }
+          }
+        }
       }
-    }
-    p = next
-  } while p != outerNode
+      p = n[Int(p)].next
+    } while p != stop
+  }
 
   guard m >= 0 else { return -1 }
 
   // look for points inside the triangle of hole point, segment intersection and endpoint;
   // if there are no points found, we have a valid connection;
   // otherwise choose the point of the minimum angle with the ray as connection point
-  let stop = m
   let mx = n[Int(m)].x
   let my = n[Int(m)].y
+  let minY = min(hy, my)
+  let maxY = max(hy, my)
   var tanMin = Double.infinity
 
-  p = m
-  repeat {
-    if hx >= n[Int(p)].x, n[Int(p)].x >= mx, hx != n[Int(p)].x,
-       pointInTriangle(hy < my ? hx : qx, hy, mx, my, hy < my ? qx : hx, hy, n[Int(p)].x, n[Int(p)].y)
-    {
-      let tan = abs(hy - n[Int(p)].y) / (hx - n[Int(p)].x)
+  for block in 0 ..< blocks.pointee.count {
+    let bounds = blocks.pointee.box(block)
+    if bounds.maxX < mx || bounds.minX > hx || bounds.maxY < minY || bounds.minY > maxY { continue }
 
-      if locallyInside(n, p, hole),
-         tan < tanMin
-           || (tan == tanMin && (n[Int(p)].x > n[Int(m)].x
-                 || (n[Int(p)].x == n[Int(m)].x && sectorContainsSector(n, m, p))))
+    let stop = blocks.pointee.liveStop(n, block)
+    var p = blocks.pointee.liveHead(n, block)
+    repeat {
+      let px = n[Int(p)].x, py = n[Int(p)].y
+      if n[Int(n[Int(p)].prev)].next == p, hx >= px, px >= mx, hx != px,
+         pointInTriangle(hy < my ? hx : qx, hy, mx, my, hy < my ? qx : hx, hy, px, py)
       {
-        m = p
-        tanMin = tan
-      }
-    }
+        let tan = abs(hy - py) / (hx - px)
+        let next = n[Int(p)].next
 
-    p = n[Int(p)].next
-  } while p != stop
+        // a hole point sitting on p's horizontal edge is a valid T-junction bridge even
+        // though locallyInside rejects it as collinear
+        if locallyInside(n, p, hole) || (py == hy && n[Int(next)].y == hy && n[Int(next)].x > hx),
+           tan < tanMin
+             || (tan == tanMin && (px > n[Int(m)].x
+                   || (px == n[Int(m)].x && sectorContainsSector(n, m, p))))
+        {
+          m = p
+          tanMin = tan
+        }
+      }
+      p = n[Int(p)].next
+    } while p != stop
+  }
 
   return m
 }
