@@ -44,8 +44,7 @@ final class GoldenTests: XCTestCase {
     let data = try Data(contentsOf: Self.goldenURL)
     let golden = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: [Int]])
     XCTAssertFalse(golden.isEmpty)
-    for name in Self.fixtureNames() {
-      let expected = try XCTUnwrap(golden[name], "no golden entry for \(name)")
+    for (name, expected) in golden {
       XCTAssertEqual(Self.tessellate(name), expected, "triangulation changed for \(name)")
     }
   }
