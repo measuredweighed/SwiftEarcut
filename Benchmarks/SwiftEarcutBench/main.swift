@@ -45,16 +45,28 @@ func loadFixtures(_ directory: URL) -> [Fixture] {
     }
 }
 
-func measure(_ fixture: Fixture, budget: Double) -> (opsPerSec: Double, triangles: Int) {
-  var triangles = 0
-  for _ in 0..<3 {
-    triangles = Earcut.tessellate(fixture.vertices, holeIndices: fixture.holes, dim: fixture.dimensions).count / 3
+func measure(_ fixture: Fixture, budget: Double, reuse: Bool) -> (opsPerSec: Double, triangles: Int) {
+  let tessellator = Tessellator(reservingVertices: fixture.vertices.count / fixture.dimensions)
+  var output = [UInt32]()
+
+  @inline(__always)
+  func once() {
+    if reuse {
+      tessellator.tessellate(
+        fixture.vertices, holeIndices: fixture.holes, dim: fixture.dimensions, into: &output)
+    } else {
+      output = Earcut.tessellate(fixture.vertices, holeIndices: fixture.holes, dim: fixture.dimensions)
+    }
   }
+
+  for _ in 0..<3 { once() }
+  let triangles = output.count / 3
+
   var ops = 0
   let start = now()
   var elapsed = 0.0
   repeat {
-    _ = Earcut.tessellate(fixture.vertices, holeIndices: fixture.holes, dim: fixture.dimensions)
+    once()
     ops += 1
     elapsed = now() - start
   } while elapsed < budget
@@ -62,6 +74,7 @@ func measure(_ fixture: Fixture, budget: Double) -> (opsPerSec: Double, triangle
 }
 
 let quick = CommandLine.arguments.contains("--quick")
+let reuse = CommandLine.arguments.contains("--reuse")
 let budget = quick ? 0.06 : 0.3
 let fixtures = loadFixtures(fixtureDirectory())
 
@@ -78,12 +91,13 @@ func padLeft(_ s: String, _ width: Int) -> String {
   s.count >= width ? s : String(repeating: " ", count: width - s.count) + s
 }
 
+print(reuse ? "reusing a Tessellator" : "fresh Earcut.tessellate per call")
 print(pad("fixture", 24) + padLeft("verts", 8) + padLeft("tris", 8) + padLeft("ops/sec", 14) + padLeft("us/op", 12))
 print(String(repeating: "-", count: 66))
 
 var totalMicros = 0.0
 for fixture in fixtures {
-  let (ops, triangles) = measure(fixture, budget: budget)
+  let (ops, triangles) = measure(fixture, budget: budget, reuse: reuse)
   let micros = 1_000_000 / ops
   totalMicros += micros
   print(pad(fixture.name, 24)

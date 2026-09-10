@@ -24,3 +24,38 @@ final class RobustnessTests: XCTestCase {
     XCTAssertEqual(MemoryLayout<Node>.stride, 40)
   }
 }
+
+final class TessellatorTests: XCTestCase {
+
+  private static func fixture(_ name: String) -> [[[Double]]] {
+    let url = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+      .appendingPathComponent("fixtures/\(name).json")
+    return try! JSONDecoder().decode([[[Double]]].self, from: try! Data(contentsOf: url))
+  }
+
+  /// A reused Tessellator must give the same answer as a fresh one, in any order, so that
+  /// nothing leaks between runs through the arena, block index or steiner table.
+  func testReuseMatchesFreshAcrossFixtures() {
+    let names = ["water", "dude", "touching-holes3", "steiner", "issue16", "hilbert",
+                 "degenerate", "water3b", "self-tangent-2", "empty-square"]
+    let tessellator = Tessellator()
+    for name in names + names.reversed() {
+      let flat = Earcut.flatten(Self.fixture(name))
+      XCTAssertEqual(
+        tessellator.tessellate(flat.vertices, holeIndices: flat.holes, dim: flat.dimensions),
+        Earcut.tessellate(flat.vertices, holeIndices: flat.holes, dim: flat.dimensions),
+        name)
+    }
+  }
+
+  func testTessellateIntoReusesOutput() {
+    let flat = Earcut.flatten(Self.fixture("dude"))
+    let tessellator = Tessellator()
+    var output: [UInt32] = [99, 98, 97]
+    tessellator.tessellate(flat.vertices, holeIndices: flat.holes, dim: flat.dimensions, into: &output)
+    XCTAssertEqual(output, Earcut.tessellate(flat.vertices, holeIndices: flat.holes, dim: flat.dimensions))
+
+    tessellator.tessellate([], into: &output)
+    XCTAssertEqual(output, [])
+  }
+}

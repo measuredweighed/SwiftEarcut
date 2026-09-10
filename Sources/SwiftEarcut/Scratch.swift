@@ -79,7 +79,16 @@ struct TriangleBuffer {
     self.capacity = capacity
   }
 
+  mutating func removeAll() {
+    count = 0
+  }
+
   func makeArray() -> [UInt32] {
     Array(UnsafeBufferPointer(start: base, count: count))
+  }
+
+  func write(into output: inout [UInt32]) {
+    output.removeAll(keepingCapacity: true)
+    output.append(contentsOf: UnsafeBufferPointer(start: base, count: count))
   }
 }

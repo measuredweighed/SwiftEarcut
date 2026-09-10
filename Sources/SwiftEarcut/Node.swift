@@ -35,6 +35,10 @@ struct Nodes {
     base.deallocate()
   }
 
+  mutating func removeAll() {
+    count = 0
+  }
+
   @inline(never)
   mutating func reserve(_ extra: Int32) {
     #if EARCUT_STRESS_ARENA

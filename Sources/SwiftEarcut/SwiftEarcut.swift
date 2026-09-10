@@ -34,64 +34,8 @@ public enum Earcut {
   /// ```
   public static func tessellate(_ data: [Double], holeIndices: [Int] = [], dim: Int = 2) -> [UInt32] {
     guard !data.isEmpty else { return [] }
-    return data.withUnsafeBufferPointer { tessellate($0, holeIndices, dim) }
-  }
-
-  private static func tessellate(
-    _ data: UnsafeBufferPointer<Double>,
-    _ holeIndices: [Int],
-    _ dim: Int)
-    -> [UInt32]
-  {
-    var triangles = TriangleBuffer(minimumCapacity: 3 * (data.count / dim + 8))
-    defer { triangles.deallocate() }
-
-    let hasHoles = holeIndices.count > 0
-    let outerLen = hasHoles ? holeIndices[0] * dim : data.count
-
-    var nodes = Nodes(minimumCapacity: Int32(data.count / dim + 2 * holeIndices.count + 8))
-    defer { nodes.deallocate() }
-    var scratch = Scratch()
-    defer { scratch.deallocate() }
-    let blocks = UnsafeMutablePointer<BlockIndex>.allocate(capacity: 1)
-    blocks.initialize(to: BlockIndex())
-    defer { blocks.pointee.deallocate(); blocks.deallocate() }
-    var steiners = [Int32]()
-
-    var outerNode = linkedList(&nodes, data, 0, outerLen, dim, true)
-    guard outerNode >= 0 else { return [] }
-    guard nodes.base[Int(outerNode)].next != nodes.base[Int(outerNode)].prev else { return [] }
-
-    var minX: Double = 0, maxX: Double = 0, minY: Double = 0, maxY: Double = 0
-    var invSize: Double = 0
-
-    if hasHoles {
-      outerNode = eliminateHoles(&nodes, data, holeIndices, outerNode, dim, &steiners, blocks)
-    }
-
-    // if the shape is not too simple, we'll use z-order curve hash later; calculate polygon bbox
-    if data.count > 80 * dim {
-      minX = data[0]
-      maxX = minX
-      minY = data[1]
-      maxY = minY
-
-      for i in stride(from: dim, to: outerLen, by: dim) {
-        let x = data[i]
-        let y = data[i + 1]
-        if x < minX { minX = x }
-        if y < minY { minY = y }
-        if x > maxX { maxX = x }
-        if y > maxY { maxY = y }
-      }
-
-      invSize = max(maxX - minX, maxY - minY)
-      invSize = invSize != 0 ? 32767 / invSize : 0
-    }
-
-    earcutLinked(&nodes, outerNode, &triangles, minX, minY, invSize, steiners, &scratch)
-
-    return triangles.makeArray()
+    return Tessellator(reservingVertices: data.count / dim)
+      .tessellate(data, holeIndices: holeIndices, dim: dim)
   }
 
   /// Converts a multi-dimensional array of vertices (e.g. GeoJSON Polygon) to the format expected by the ``tessellate(_:holeIndices:dim:)`` method. Returns (1) flattened array of Doubles with the vertices coordinate components, (2) indices of potential holes in the polygon, and  (3) the coordinate's dimension.
@@ -192,6 +136,55 @@ extension Earcut {
   {
     deviation(data, holeIndices: holeIndices, dim: dim, triangles: indices.map(UInt32.init))
   }
+}
+
+/// Drives one triangulation over caller-owned buffers, so a `Tessellator` can hold them
+/// across calls. Every buffer is assumed already emptied and sized by the caller.
+func earcut(
+  _ data: UnsafeBufferPointer<Double>,
+  _ holeIndices: [Int],
+  _ dim: Int,
+  _ nodes: inout Nodes,
+  _ scratch: inout Scratch,
+  _ blocks: UnsafeMutablePointer<BlockIndex>,
+  _ triangles: inout TriangleBuffer,
+  _ steiners: inout [Int32])
+{
+  let hasHoles = holeIndices.count > 0
+  let outerLen = hasHoles ? holeIndices[0] * dim : data.count
+
+  var outerNode = linkedList(&nodes, data, 0, outerLen, dim, true)
+  guard outerNode >= 0 else { return }
+  guard nodes.base[Int(outerNode)].next != nodes.base[Int(outerNode)].prev else { return }
+
+  var minX: Double = 0, maxX: Double = 0, minY: Double = 0, maxY: Double = 0
+  var invSize: Double = 0
+
+  if hasHoles {
+    outerNode = eliminateHoles(&nodes, data, holeIndices, outerNode, dim, &steiners, blocks)
+  }
+
+  // if the shape is not too simple, we'll use z-order curve hash later; calculate polygon bbox
+  if data.count > 80 * dim {
+    minX = data[0]
+    maxX = minX
+    minY = data[1]
+    maxY = minY
+
+    for i in stride(from: dim, to: outerLen, by: dim) {
+      let x = data[i]
+      let y = data[i + 1]
+      if x < minX { minX = x }
+      if y < minY { minY = y }
+      if x > maxX { maxX = x }
+      if y > maxY { maxY = y }
+    }
+
+    invSize = max(maxX - minX, maxY - minY)
+    invSize = invSize != 0 ? 32767 / invSize : 0
+  }
+
+  earcutLinked(&nodes, outerNode, &triangles, minX, minY, invSize, steiners, &scratch)
 }
 
 // MARK: - Ring construction
