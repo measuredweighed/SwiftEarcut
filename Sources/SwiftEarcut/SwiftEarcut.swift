@@ -41,6 +41,8 @@ public enum Earcut {
 
     var nodes = Nodes(minimumCapacity: Int32(data.count / dim + 2 * holeIndices.count + 8))
     defer { nodes.deallocate() }
+    var scratch = Scratch()
+    defer { scratch.deallocate() }
     var steiners = [Int32]()
 
     var outerNode = linkedList(&nodes, data, 0, outerLen, dim, true)
@@ -74,7 +76,7 @@ public enum Earcut {
       invSize = invSize != 0 ? 32767 / invSize : 0
     }
 
-    earcutLinked(&nodes, outerNode, &triangles, minX, minY, invSize, steiners)
+    earcutLinked(&nodes, outerNode, &triangles, minX, minY, invSize, steiners, &scratch)
 
     return triangles
   }
@@ -262,12 +264,16 @@ private func earcutLinked(
   _ minX: Double,
   _ minY: Double,
   _ invSize: Double,
-  _ steiners: [Int32])
+  _ steiners: [Int32],
+  _ scratch: inout Scratch)
 {
   var ear = ear
   let n = nodes.base
 
-  if invSize > 0 { indexCurve(n, ear, minX, minY, invSize) }
+  if invSize > 0 {
+    scratch.reserve(nodes.count)
+    indexCurve(n, ear, minX, minY, invSize, &scratch)
+  }
 
   var stop = ear
   var cured = false
@@ -309,7 +315,7 @@ private func earcutLinked(
       }
 
       // `n` is dead below this point: splitEarcut reserves.
-      splitEarcut(&nodes, ear, &triangles, minX, minY, invSize, steiners)
+      splitEarcut(&nodes, ear, &triangles, minX, minY, invSize, steiners, &scratch)
       break
     }
   }
@@ -429,7 +435,8 @@ private func splitEarcut(
   _ minX: Double,
   _ minY: Double,
   _ invSize: Double,
-  _ steiners: [Int32])
+  _ steiners: [Int32],
+  _ scratch: inout Scratch)
 {
   nodes.reserve(2)
   let n = nodes.base
@@ -445,8 +452,8 @@ private func splitEarcut(
         c = filterPoints(n, c, n[Int(c)].next, steiners).end
 
         // `n` is dead below this point: earcutLinked may reserve.
-        earcutLinked(&nodes, a, &triangles, minX, minY, invSize, steiners)
-        earcutLinked(&nodes, c, &triangles, minX, minY, invSize, steiners)
+        earcutLinked(&nodes, a, &triangles, minX, minY, invSize, steiners, &scratch)
+        earcutLinked(&nodes, c, &triangles, minX, minY, invSize, steiners, &scratch)
         return
       }
       b = n[Int(b)].next
@@ -575,82 +582,90 @@ private func indexCurve(
   _ start: Int32,
   _ minX: Double,
   _ minY: Double,
-  _ invSize: Double)
+  _ invSize: Double,
+  _ scratch: inout Scratch)
 {
+  let order = scratch.order
   var p = start
+  var count: Int32 = 0
   repeat {
+    // z may still hold a block index left over from hole elimination
     n[Int(p)].z = zOrder(n[Int(p)].x, n[Int(p)].y, minX, minY, invSize)
-    n[Int(p)].prevZ = n[Int(p)].prev
-    n[Int(p)].nextZ = n[Int(p)].next
+    order[Int(count)] = p
+    count += 1
     p = n[Int(p)].next
   } while p != start
 
-  let prevZ = n[Int(p)].prevZ
-  if prevZ >= 0 { n[Int(prevZ)].nextZ = -1 }
-  n[Int(p)].prevZ = -1
+  sortNodes(n, count, &scratch)
 
-  _ = sortLinked(n, p)
+  let sorted = scratch.order
+  var prev: Int32 = -1
+  for k in 0 ..< Int(count) {
+    let node = sorted[k]
+    n[Int(node)].prevZ = prev
+    if prev >= 0 { n[Int(prev)].nextZ = node }
+    prev = node
+  }
+  if prev >= 0 { n[Int(prev)].nextZ = -1 }
 }
 
-/// Simon Tatham's linked list merge sort algorithm
-/// http://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
-private func sortLinked(_ n: UnsafeMutablePointer<Node>, _ head: Int32) -> Int32 {
-  var list = head
-  var tail: Int32 = -1
-  var e: Int32 = -1
-  var p: Int32 = -1
-  var q: Int32 = -1
-  var qSize = 0
-  var pSize = 0
-  var inSize = 1
-  var numMerges = 0
+/// Insertion sort below the point where building a histogram pays for itself,
+/// otherwise a four-pass LSD radix sort over z's 30 bits.
+private func sortNodes(_ n: UnsafeMutablePointer<Node>, _ count: Int32, _ scratch: inout Scratch) {
+  let order = scratch.order
 
-  repeat {
-    p = list
-    list = -1
-    tail = -1
-    numMerges = 0
-
-    while p >= 0 {
-      numMerges += 1
-      q = p
-      pSize = 0
-      for _ in 0 ..< inSize {
-        pSize += 1
-        q = n[Int(q)].nextZ
-        if q < 0 { break }
+  if count <= 32 {
+    for i in 1 ..< Int(count) {
+      let node = order[i]
+      let z = n[Int(node)].z
+      var j = i - 1
+      while j >= 0, n[Int(order[j])].z > z {
+        order[j + 1] = order[j]
+        j -= 1
       }
-      qSize = inSize
-
-      while pSize > 0 || (qSize > 0 && q >= 0) {
-        if pSize != 0, qSize == 0 || q < 0 || n[Int(p)].z <= n[Int(q)].z {
-          e = p
-          p = n[Int(p)].nextZ
-          pSize -= 1
-        } else {
-          e = q
-          q = n[Int(q)].nextZ
-          qSize -= 1
-        }
-
-        if tail >= 0 {
-          n[Int(tail)].nextZ = e
-        } else {
-          list = e
-        }
-
-        n[Int(e)].prevZ = tail
-        tail = e
-      }
-
-      p = q
+      order[j + 1] = node
     }
+    return
+  }
 
-    if tail >= 0 { n[Int(tail)].nextZ = -1 }
-    inSize *= 2
-  } while numMerges > 1
+  let zValues = scratch.zValues, zBuffer = scratch.zBuffer
+  let buffer = scratch.orderBuffer, counts = scratch.counts
+  for i in 0 ..< Int(count) { zValues[i] = n[Int(order[i])].z }
 
-  return list
+  radixPass(count, order, zValues, buffer, zBuffer, 0, counts)
+  radixPass(count, buffer, zBuffer, order, zValues, 8, counts)
+  radixPass(count, order, zValues, buffer, zBuffer, 16, counts)
+  radixPass(count, buffer, zBuffer, order, zValues, 24, counts)
+}
+
+@inline(never)
+private func radixPass(
+  _ count: Int32,
+  _ source: UnsafeMutablePointer<Int32>,
+  _ sourceZ: UnsafeMutablePointer<UInt32>,
+  _ destination: UnsafeMutablePointer<Int32>,
+  _ destinationZ: UnsafeMutablePointer<UInt32>,
+  _ shift: UInt32,
+  _ counts: UnsafeMutablePointer<UInt32>)
+{
+  counts.update(repeating: 0, count: 256)
+  for i in 0 ..< Int(count) { counts[Int((sourceZ[i] >> shift) & 0xFF)] += 1 }
+
+  var sum: UInt32 = 0
+  for bucket in 0 ..< 256 {
+    let c = counts[bucket]
+    counts[bucket] = sum
+    sum += c
+  }
+
+  for i in 0 ..< Int(count) {
+    let z = sourceZ[i]
+    let bucket = Int((z >> shift) & 0xFF)
+    let position = Int(counts[bucket])
+    counts[bucket] = UInt32(position + 1)
+    destination[position] = source[i]
+    destinationZ[position] = z
+  }
 }
 
 /// The bbox is measured over the outer ring only, so merged hole vertices can fall outside it.
