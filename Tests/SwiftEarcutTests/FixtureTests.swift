@@ -26,7 +26,6 @@ final class FixtureTests: XCTestCase {
     "issue147",
     "issue16",
     "issue52",
-    "self-tangent-4",
     "touching-holes2",
     "touching-holes3",
     "touching-holes5",

@@ -395,11 +395,14 @@ private func cureLocalIntersections(
 {
   var start = start
   var p = start
+  var cured = false
   repeat {
     let a = n[Int(p)].prev
     let b = n[Int(n[Int(p)].next)].next
 
-    if !equals(n, a, b), intersects(n, a, p, n[Int(p)].next, b), locallyInside(n, a, b), locallyInside(n, b, a) {
+    if intersects(n, a, p, n[Int(p)].next, b, includeBoundary: false),
+       locallyInside(n, a, b), locallyInside(n, b, a)
+    {
       triangles.append(Int(n[Int(a)].i))
       triangles.append(Int(n[Int(p)].i))
       triangles.append(Int(n[Int(b)].i))
@@ -409,11 +412,12 @@ private func cureLocalIntersections(
 
       p = b
       start = b
+      cured = true
     }
     p = n[Int(p)].next
   } while p != start
 
-  return filterPoints(n, p, p, steiners).end
+  return cured ? filterPoints(n, p, p, steiners).end : p
 }
 
 /// try splitting polygon into two and triangulate them independently
@@ -691,15 +695,16 @@ private func pointInTriangle(
 }
 
 private func isValidDiagonal(_ n: UnsafeMutablePointer<Node>, _ a: Int32, _ b: Int32) -> Bool {
-  n[Int(n[Int(a)].next)].i != n[Int(b)].i
-    && n[Int(n[Int(a)].prev)].i != n[Int(b)].i
+  let zeroLength = equals(n, a, b)
+    && area(n, n[Int(a)].prev, a, n[Int(a)].next) > 0
+    && area(n, n[Int(b)].prev, b, n[Int(b)].next) > 0
+
+  return n[Int(n[Int(a)].next)].i != n[Int(b)].i
+    && (zeroLength
+      || (locallyInside(n, a, b) && locallyInside(n, b, a)
+        && (area(n, n[Int(a)].prev, a, n[Int(b)].prev) != 0 || area(n, a, n[Int(b)].prev, b) != 0)))
     && !intersectsPolygon(n, a, b)
-    && (
-      locallyInside(n, a, b) && locallyInside(n, b, a) && middleInside(n, a, b)
-        && (area(n, n[Int(a)].prev, a, n[Int(b)].prev) > 0 || area(n, a, n[Int(b)].prev, b) > 0)
-        || equals(n, a, b)
-        && area(n, n[Int(a)].prev, a, n[Int(a)].next) > 0
-        && area(n, n[Int(b)].prev, b, n[Int(b)].next) > 0)
+    && (zeroLength || middleInside(n, a, b))
 }
 
 @inline(__always)
@@ -716,15 +721,20 @@ private func equals(_ n: UnsafeMutablePointer<Node>, _ p: Int32, _ q: Int32) -> 
 private func intersects(
   _ n: UnsafeMutablePointer<Node>,
   _ p1: Int32, _ q1: Int32,
-  _ p2: Int32, _ q2: Int32)
+  _ p2: Int32, _ q2: Int32,
+  includeBoundary: Bool = true)
   -> Bool
 {
-  let o1 = sign(area(n, p1, q1, p2))
-  let o2 = sign(area(n, p1, q1, q2))
-  let o3 = sign(area(n, p2, q2, p1))
-  let o4 = sign(area(n, p2, q2, q1))
+  let o1 = area(n, p1, q1, p2)
+  let o2 = area(n, p1, q1, q2)
+  let o3 = area(n, p2, q2, p1)
+  let o4 = area(n, p2, q2, q1)
 
-  if o1 != o2, o3 != o4 { return true }
+  if ((o1 > 0 && o2 < 0) || (o1 < 0 && o2 > 0)) && ((o3 > 0 && o4 < 0) || (o3 < 0 && o4 > 0)) {
+    return true
+  }
+
+  guard includeBoundary else { return false }
 
   if o1 == 0, onSegment(n, p1, p2, q1) { return true }
   if o2 == 0, onSegment(n, p1, q2, q1) { return true }
@@ -742,9 +752,23 @@ private func onSegment(_ n: UnsafeMutablePointer<Node>, _ p: Int32, _ q: Int32, 
 }
 
 private func intersectsPolygon(_ n: UnsafeMutablePointer<Node>, _ a: Int32, _ b: Int32) -> Bool {
+  let ax = n[Int(a)].x, ay = n[Int(a)].y, bx = n[Int(b)].x, by = n[Int(b)].y
+  let minX = min(ax, bx), maxX = max(ax, bx)
+  let minY = min(ay, by), maxY = max(ay, by)
+
   var p = a
   repeat {
     let next = n[Int(p)].next
+    let px = n[Int(p)].x, py = n[Int(p)].y
+    let nx = n[Int(next)].x, ny = n[Int(next)].y
+
+    if (px > maxX && nx > maxX) || (px < minX && nx < minX)
+      || (py > maxY && ny > maxY) || (py < minY && ny < minY)
+    {
+      p = next
+      continue
+    }
+
     if n[Int(p)].i != n[Int(a)].i, n[Int(next)].i != n[Int(a)].i,
        n[Int(p)].i != n[Int(b)].i, n[Int(next)].i != n[Int(b)].i,
        intersects(n, p, next, a, b)
@@ -820,9 +844,4 @@ private func signedArea(_ data: [Double], _ start: Int, _ end: Int, _ dim: Int) 
     j = i
   }
   return sum
-}
-
-@inline(__always)
-private func sign(_ num: Double) -> Int {
-  num > 0 ? 1 : num < 0 ? -1 : 0
 }
