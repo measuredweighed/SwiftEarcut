@@ -37,7 +37,7 @@ func loadFixtures(_ directory: URL) -> [Fixture] {
     .compactMap { name in
       guard
         let data = try? Data(contentsOf: directory.appendingPathComponent(name)),
-        let rings = try? JSONSerialization.jsonObject(with: data) as? [[[Double]]],
+        let rings = try? JSONDecoder().decode([[[Double]]].self, from: data),
         let first = rings.first?.first, !first.isEmpty
       else { return nil }
       let flat = Earcut.flatten(data: rings)

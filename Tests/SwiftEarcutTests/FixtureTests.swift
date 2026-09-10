@@ -14,10 +14,6 @@ final class FixtureTests: XCTestCase {
     }
   }
 
-  /// Fixtures whose output has not yet been brought up to earcut 3.2.3. Shrinks to empty
-  /// as the port lands; the suite fails if one starts passing without being removed.
-  static let pendingUpstreamPort: Set<String> = ["issue16"]
-
   static let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
 
   static let expected: Expected = {
@@ -25,12 +21,13 @@ final class FixtureTests: XCTestCase {
     return try! JSONDecoder().decode(Expected.self, from: data)
   }()
 
+  /// JSONDecoder, not JSONSerialization: the latter rounds some fixture decimals to the
+  /// wrong double, which shifts the measured deviation well past upstream's tolerances.
   static func rings(_ name: String) -> [[[Double]]]? {
-    guard
-      let data = try? Data(contentsOf: root.appendingPathComponent("fixtures/\(name).json")),
-      let rings = try? JSONSerialization.jsonObject(with: data) as? [[[Double]]]
-    else { return nil }
-    return rings
+    guard let data = try? Data(contentsOf: root.appendingPathComponent("fixtures/\(name).json")) else {
+      return nil
+    }
+    return try? JSONDecoder().decode([[[Double]]].self, from: data)
   }
 
   func check(_ name: String) -> String? {
@@ -55,20 +52,9 @@ final class FixtureTests: XCTestCase {
   }
 
   func testFixtures() {
-    var unexpectedFailures = [String]()
-    var unexpectedPasses = [String]()
-
-    for name in Self.expected.triangles.keys.sorted() {
-      let failure = check(name)
-      let isPending = Self.pendingUpstreamPort.contains(name)
-      if let failure, !isPending {
-        unexpectedFailures.append("\(name): \(failure)")
-      } else if failure == nil, isPending {
-        unexpectedPasses.append(name)
-      }
+    let failures = Self.expected.triangles.keys.sorted().compactMap { name in
+      check(name).map { "\(name): \($0)" }
     }
-
-    XCTAssertEqual(unexpectedFailures, [], "fixtures regressed")
-    XCTAssertEqual(unexpectedPasses, [], "now matching upstream — remove from pendingUpstreamPort")
+    XCTAssertEqual(failures, [])
   }
 }
