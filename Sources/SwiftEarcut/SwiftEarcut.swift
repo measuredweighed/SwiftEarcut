@@ -74,7 +74,7 @@ public enum Earcut {
       invSize = invSize != 0 ? 32767 / invSize : 0
     }
 
-    earcutLinked(&nodes, outerNode, &triangles, dim, minX, minY, invSize, 0, steiners)
+    earcutLinked(&nodes, outerNode, &triangles, minX, minY, invSize, 0, steiners)
 
     return triangles
   }
@@ -153,11 +153,11 @@ private func linkedList(
   var last: Int32 = -1
   if clockwise == (signedArea(data, start, end, dim) > 0) {
     for i in stride(from: start, to: end, by: dim) {
-      last = insertNode(&nodes, UInt32(i), data[i], data[i + 1], last)
+      last = insertNode(&nodes, UInt32(i / dim), data[i], data[i + 1], last)
     }
   } else {
     for i in stride(from: end - dim, through: start, by: -dim) {
-      last = insertNode(&nodes, UInt32(i), data[i], data[i + 1], last)
+      last = insertNode(&nodes, UInt32(i / dim), data[i], data[i + 1], last)
     }
   }
 
@@ -255,7 +255,6 @@ private func earcutLinked(
   _ nodes: inout Nodes,
   _ ear: Int32,
   _ triangles: inout [Int],
-  _ dim: Int,
   _ minX: Double,
   _ minY: Double,
   _ invSize: Double,
@@ -276,9 +275,9 @@ private func earcutLinked(
     let next = n[Int(ear)].next
 
     if invSize > 0 ? isEarHashed(n, ear, minX, minY, invSize) : isEar(n, ear) {
-      triangles.append(Int(n[Int(prev)].i) / dim)
-      triangles.append(Int(n[Int(ear)].i) / dim)
-      triangles.append(Int(n[Int(next)].i) / dim)
+      triangles.append(Int(n[Int(prev)].i))
+      triangles.append(Int(n[Int(ear)].i))
+      triangles.append(Int(n[Int(next)].i))
 
       removeNode(n, ear)
 
@@ -295,12 +294,12 @@ private func earcutLinked(
     if ear == stop {
       // `n` is dead below this point: every branch may reserve, and each one breaks out.
       if pass == 0 {
-        earcutLinked(&nodes, filterPoints(n, ear, ear, steiners), &triangles, dim, minX, minY, invSize, 1, steiners)
+        earcutLinked(&nodes, filterPoints(n, ear, ear, steiners), &triangles, minX, minY, invSize, 1, steiners)
       } else if pass == 1 {
-        ear = cureLocalIntersections(n, filterPoints(n, ear, ear, steiners), &triangles, dim, steiners)
-        earcutLinked(&nodes, ear, &triangles, dim, minX, minY, invSize, 2, steiners)
+        ear = cureLocalIntersections(n, filterPoints(n, ear, ear, steiners), &triangles, steiners)
+        earcutLinked(&nodes, ear, &triangles, minX, minY, invSize, 2, steiners)
       } else if pass == 2 {
-        splitEarcut(&nodes, ear, &triangles, dim, minX, minY, invSize, steiners)
+        splitEarcut(&nodes, ear, &triangles, minX, minY, invSize, steiners)
       }
 
       break
@@ -400,7 +399,6 @@ private func cureLocalIntersections(
   _ n: UnsafeMutablePointer<Node>,
   _ start: Int32,
   _ triangles: inout [Int],
-  _ dim: Int,
   _ steiners: [Int32])
   -> Int32
 {
@@ -411,9 +409,9 @@ private func cureLocalIntersections(
     let b = n[Int(n[Int(p)].next)].next
 
     if !equals(n, a, b), intersects(n, a, p, n[Int(p)].next, b), locallyInside(n, a, b), locallyInside(n, b, a) {
-      triangles.append(Int(n[Int(a)].i) / dim)
-      triangles.append(Int(n[Int(p)].i) / dim)
-      triangles.append(Int(n[Int(b)].i) / dim)
+      triangles.append(Int(n[Int(a)].i))
+      triangles.append(Int(n[Int(p)].i))
+      triangles.append(Int(n[Int(b)].i))
 
       removeNode(n, p)
       removeNode(n, n[Int(p)].next)
@@ -433,7 +431,6 @@ private func splitEarcut(
   _ nodes: inout Nodes,
   _ start: Int32,
   _ triangles: inout [Int],
-  _ dim: Int,
   _ minX: Double,
   _ minY: Double,
   _ invSize: Double,
@@ -453,8 +450,8 @@ private func splitEarcut(
         c = filterPoints(n, c, n[Int(c)].next, steiners)
 
         // `n` is dead below this point: earcutLinked may reserve.
-        earcutLinked(&nodes, a, &triangles, dim, minX, minY, invSize, 0, steiners)
-        earcutLinked(&nodes, c, &triangles, dim, minX, minY, invSize, 0, steiners)
+        earcutLinked(&nodes, a, &triangles, minX, minY, invSize, 0, steiners)
+        earcutLinked(&nodes, c, &triangles, minX, minY, invSize, 0, steiners)
         return
       }
       b = n[Int(b)].next

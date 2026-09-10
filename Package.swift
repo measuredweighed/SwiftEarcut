@@ -28,7 +28,9 @@ let package = Package(
             name: "SwiftEarcutTests",
             dependencies: ["SwiftEarcut"],
             resources: [
-                .copy("fixtures/")
+                .copy("fixtures/"),
+                .copy("expected.json"),
+                .copy("golden-2.2.4.json"),
             ]
         ),
     ]
