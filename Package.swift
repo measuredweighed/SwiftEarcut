@@ -30,7 +30,6 @@ let package = Package(
             resources: [
                 .copy("fixtures/"),
                 .copy("expected.json"),
-                .copy("golden-2.2.4.json"),
             ]
         ),
     ]
