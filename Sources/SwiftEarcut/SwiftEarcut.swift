@@ -5,8 +5,6 @@
 // A Swift Earcut port of Mapbox's earcut.js
 // https://github.com/mapbox/earcut
 
-import Foundation
-
 // Pointer lifetime: functions taking `inout Nodes` may mutate the arena, and those that
 // call `reserve` may move it. Everything else takes a bare `UnsafeMutablePointer<Node>`
 // and so cannot reallocate by construction. A pointer bound from `nodes.base` is dead

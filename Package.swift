@@ -1,4 +1,4 @@
-// swift-tools-version: 5.6
+// swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -19,11 +19,13 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "SwiftEarcut"),
+            name: "SwiftEarcut",
+            swiftSettings: [.swiftLanguageMode(.v6)]),
         .executableTarget(
             name: "SwiftEarcutBench",
             dependencies: ["SwiftEarcut"],
-            path: "Benchmarks/SwiftEarcutBench"),
+            path: "Benchmarks/SwiftEarcutBench",
+            swiftSettings: [.swiftLanguageMode(.v6)]),
         .testTarget(
             name: "SwiftEarcutTests",
             dependencies: ["SwiftEarcut"],
