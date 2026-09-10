@@ -698,10 +698,18 @@ private func sortLinked(_ _list: Node) -> Node {
   return list!
 }
 
+/// The bbox is measured over the outer ring only, so merged hole vertices can fall outside it.
+/// Clamping is monotone per axis, preserving the containment `z(x0,y0) <= z(p) <= z(x1,y1)`
+/// that `isEarHashed` prunes on; the unclamped conversion traps.
+@inline(__always)
+private func zClamp(_ v: Double) -> UInt32 {
+  v > 0 ? (v < 32767 ? UInt32(v) : 32767) : 0
+}
+
 /// z-order of a point given coords and size of the data bounding box
 private func zOrder(_ x: Double, _ y: Double, _ minX: Double, _ minY: Double, _ invSize: Double) -> Int {
-  var x = UInt32((x - minX) * invSize)
-  var y = UInt32((y - minY) * invSize)
+  var x = zClamp((x - minX) * invSize)
+  var y = zClamp((y - minY) * invSize)
 
   x = (x | (x << 8)) & 0x00FF00FF
   x = (x | (x << 4)) & 0x0F0F0F0F
