@@ -109,3 +109,36 @@ for fixture in fixtures {
 
 print(String(repeating: "-", count: 66))
 print(pad("TOTAL", 24) + padLeft(String(format: "%.2f us", totalMicros), 30) + "  across \(fixtures.count) fixtures")
+
+if CommandLine.arguments.contains("--refine") {
+  print("\n" + pad("fixture", 24) + padLeft("perimeter drop", 16) + padLeft("refine us", 12))
+  print(String(repeating: "-", count: 52))
+  func perimeter(_ t: [UInt32], _ c: [Double], _ dim: Int) -> Double {
+    var total = 0.0
+    for i in stride(from: 0, to: t.count, by: 3) {
+      for k in 0..<3 {
+        let p = Int(t[i + k]) * dim, q = Int(t[i + (k + 1) % 3]) * dim
+        total += ((c[p]-c[q])*(c[p]-c[q]) + (c[p+1]-c[q+1])*(c[p+1]-c[q+1])).squareRoot()
+      }
+    }
+    return total
+  }
+  for f in fixtures where f.vertices.count / f.dimensions > 200 {
+    let base = Earcut.tessellate(f.vertices, holeIndices: f.holes, dim: f.dimensions)
+    guard !base.isEmpty else { continue }
+    var refined = base
+    Earcut.refine(&refined, coords: f.vertices, dim: f.dimensions)
+    var ops = 0
+    let start = now()
+    var elapsed = 0.0
+    repeat {
+      var t = base
+      Earcut.refine(&t, coords: f.vertices, dim: f.dimensions)
+      ops += 1
+      elapsed = now() - start
+    } while elapsed < 0.2
+    let drop = 1 - perimeter(refined, f.vertices, f.dimensions) / perimeter(base, f.vertices, f.dimensions)
+    print(pad(f.name, 24) + padLeft(String(format: "%.1f%%", drop * 100), 16)
+      + padLeft(String(format: "%.2f", 1_000_000 * elapsed / Double(ops)), 12))
+  }
+}

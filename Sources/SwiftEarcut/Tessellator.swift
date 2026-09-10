@@ -11,16 +11,19 @@ public final class Tessellator {
   private let blocks: UnsafeMutablePointer<BlockIndex>
   private let triangles: UnsafeMutablePointer<TriangleBuffer>
   private var steiners: [Int32] = []
+  let refineScratch: UnsafeMutablePointer<RefineScratch>
 
   public init(reservingVertices vertices: Int = 0) {
     nodes = .allocate(capacity: 1)
     scratch = .allocate(capacity: 1)
     blocks = .allocate(capacity: 1)
     triangles = .allocate(capacity: 1)
+    refineScratch = .allocate(capacity: 1)
     nodes.initialize(to: Nodes(minimumCapacity: Int32(vertices)))
     scratch.initialize(to: Scratch(minimumCapacity: Int32(vertices)))
     blocks.initialize(to: BlockIndex())
     triangles.initialize(to: TriangleBuffer(minimumCapacity: 3 * vertices))
+    refineScratch.initialize(to: RefineScratch())
   }
 
   deinit {
@@ -28,10 +31,12 @@ public final class Tessellator {
     scratch.pointee.deallocate()
     blocks.pointee.deallocate()
     triangles.pointee.deallocate()
+    refineScratch.pointee.deallocate()
     nodes.deallocate()
     scratch.deallocate()
     blocks.deallocate()
     triangles.deallocate()
+    refineScratch.deallocate()
   }
 
   /// Triangulates `data`, returning triplets of vertex indices.
