@@ -18,18 +18,28 @@ If you want to get correct triangulation even on very bad data with lots of self
 
 If you pass a single vertex as a hole, Earcut treats it as a Steiner point.
 
+``Earcut/refine(_:coords:dim:)`` optionally post-processes the result into a constrained Delaunay triangulation, which maximizes the minimum angle and removes most slivers.
+
 Note that Earcut is a **2D** triangulation algorithm, and handles 3D data as if it was projected onto the XY plane (with Z component ignored).
 
 ## Topics
 
 ### 1. Preparing the Polygon
 
-- ``Earcut/Earcut/flatten(data:)``
+- ``Earcut/flatten(_:)``
 
 ### 2. Tessellating the Polygon
 
-- ``Earcut/Earcut/tessellate(data:holeIndices:dim:)``
+- ``Earcut/tessellate(_:holeIndices:dim:)``
 
-### 3. Verifying by checking the Size (optional)
+### 3. Improving Triangle Quality (optional)
 
-- ``Earcut/Earcut/deviation(data:holeIndices:dim:indices:)``
+- ``Earcut/refine(_:coords:dim:)``
+
+### 4. Verifying by checking the Size (optional)
+
+- ``Earcut/deviation(_:holeIndices:dim:triangles:)``
+
+### 5. Triangulating Many Polygons
+
+- ``Tessellator``

@@ -29,9 +29,11 @@ let package = Package(
         .testTarget(
             name: "SwiftEarcutTests",
             dependencies: ["SwiftEarcut"],
-            resources: [
-                .copy("fixtures/"),
-                .copy("expected.json"),
+            // Read from the source tree via #filePath rather than Bundle.module, so they
+            // are excluded rather than copied into the test bundle on every build.
+            exclude: [
+                "fixtures",
+                "expected.json",
             ]
         ),
     ]

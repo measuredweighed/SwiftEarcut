@@ -349,7 +349,7 @@ private func earcutLinked(
 
     ear = next
 
-    // if we looped through the whole remaining polygon and can't find any more ears
+    // back at the start with nothing cut: no ears remain, so fall through the retry ladder
     if ear == stop {
       let filtered = filterPoints(n, ear, ear, steiners)
       ear = filtered.end
@@ -592,8 +592,8 @@ private func eliminateHole(
   let bridgeReverse = splitPolygon(&nodes, bridge, hole)
   let n = nodes.base
 
-  // in ring order the splice runs bridge -> hole -> bridgeReverse -> bridge2 -> bridge's
-  // old next, so this covers the hole's edges and both new slit edges
+  // in ring order the splice runs bridge -> hole -> bridgeReverse -> bridge2 -> bridge's old
+  // next, so this one range covers the hole's edges and both new slit edges
   let bridge2 = n[Int(bridgeReverse)].next
   blocks.pointee.indexSegment(n, bridge, n[Int(bridge2)].next)
 
@@ -616,8 +616,8 @@ private func findHoleBridge(
 
   if equals(n, hole, outerNode) { return outerNode }
 
-  // find a segment intersected by a ray from the hole's leftmost point to the left;
-  // segment's endpoint with lesser x will be potential connection point
+  // cast a ray left from the hole's leftmost point; the hit segment's lesser-x endpoint is
+  // the candidate connection
   for block in 0 ..< blocks.pointee.count {
     let bounds = blocks.pointee.box(block)
     if hy < bounds.minY || hy > bounds.maxY || bounds.minX > hx || bounds.maxX <= qx { continue }
@@ -646,9 +646,8 @@ private func findHoleBridge(
 
   guard m >= 0 else { return -1 }
 
-  // look for points inside the triangle of hole point, segment intersection and endpoint;
-  // if there are no points found, we have a valid connection;
-  // otherwise choose the point of the minimum angle with the ray as connection point
+  // among the points inside the triangle of hole point, ray hit and endpoint, take the one
+  // at the minimum angle to the ray; if there are none, the first candidate already works
   let mx = n[Int(m)].x
   let my = n[Int(m)].y
   let minY = min(hy, my)
