@@ -14,4 +14,13 @@ final class RobustnessTests: XCTestCase {
     let result = Earcut.tessellate(data: vertices, holeIndices: [n], dim: 2)
     XCTAssertFalse(result.isEmpty)
   }
+
+  func testEmptyHoleRing() {
+    let square: [Double] = [0, 0, 10, 0, 10, 10, 0, 10]
+    XCTAssertEqual(Earcut.tessellate(data: square, holeIndices: [4], dim: 2).count, 6)
+  }
+
+  func testNodeLayoutIsUnpadded() {
+    XCTAssertEqual(MemoryLayout<Node>.stride, 40)
+  }
 }
