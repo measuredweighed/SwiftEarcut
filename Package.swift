@@ -20,6 +20,10 @@ let package = Package(
     targets: [
         .target(
             name: "SwiftEarcut"),
+        .executableTarget(
+            name: "SwiftEarcutBench",
+            dependencies: ["SwiftEarcut"],
+            path: "Benchmarks/SwiftEarcutBench"),
         .testTarget(
             name: "SwiftEarcutTests",
             dependencies: ["SwiftEarcut"],
