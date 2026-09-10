@@ -33,8 +33,18 @@ public enum Earcut {
   /// )
   /// ```
   public static func tessellate(_ data: [Double], holeIndices: [Int] = [], dim: Int = 2) -> [UInt32] {
-    var triangles = [UInt32]()
-    guard data.count > 0 else { return triangles }
+    guard !data.isEmpty else { return [] }
+    return data.withUnsafeBufferPointer { tessellate($0, holeIndices, dim) }
+  }
+
+  private static func tessellate(
+    _ data: UnsafeBufferPointer<Double>,
+    _ holeIndices: [Int],
+    _ dim: Int)
+    -> [UInt32]
+  {
+    var triangles = TriangleBuffer(minimumCapacity: 3 * (data.count / dim + 8))
+    defer { triangles.deallocate() }
 
     let hasHoles = holeIndices.count > 0
     let outerLen = hasHoles ? holeIndices[0] * dim : data.count
@@ -49,8 +59,8 @@ public enum Earcut {
     var steiners = [Int32]()
 
     var outerNode = linkedList(&nodes, data, 0, outerLen, dim, true)
-    guard outerNode >= 0 else { return triangles }
-    guard nodes.base[Int(outerNode)].next != nodes.base[Int(outerNode)].prev else { return triangles }
+    guard outerNode >= 0 else { return [] }
+    guard nodes.base[Int(outerNode)].next != nodes.base[Int(outerNode)].prev else { return [] }
 
     var minX: Double = 0, maxX: Double = 0, minY: Double = 0, maxY: Double = 0
     var invSize: Double = 0
@@ -81,7 +91,7 @@ public enum Earcut {
 
     earcutLinked(&nodes, outerNode, &triangles, minX, minY, invSize, steiners, &scratch)
 
-    return triangles
+    return triangles.makeArray()
   }
 
   /// Converts a multi-dimensional array of vertices (e.g. GeoJSON Polygon) to the format expected by the ``tessellate(_:holeIndices:dim:)`` method. Returns (1) flattened array of Doubles with the vertices coordinate components, (2) indices of potential holes in the polygon, and  (3) the coordinate's dimension.
@@ -123,13 +133,13 @@ public enum Earcut {
     let hasHoles = holeIndices.count > 0
     let outerLen = hasHoles ? holeIndices[0] * dim : data.count
 
-    var polygonArea = abs(signedArea(data, 0, outerLen, dim))
+    var polygonArea = abs(data.withUnsafeBufferPointer { signedArea($0, 0, outerLen, dim) })
     if hasHoles {
       let len = holeIndices.count
       for i in 0 ..< len {
         let start = holeIndices[i] * dim
         let end = i < len - 1 ? holeIndices[i + 1] * dim : data.count
-        polygonArea -= abs(signedArea(data, start, end, dim))
+        polygonArea -= abs(data.withUnsafeBufferPointer { signedArea($0, start, end, dim) })
       }
     }
 
@@ -188,7 +198,7 @@ extension Earcut {
 
 private func linkedList(
   _ nodes: inout Nodes,
-  _ data: [Double],
+  _ data: UnsafeBufferPointer<Double>,
   _ start: Int,
   _ end: Int,
   _ dim: Int,
@@ -312,7 +322,7 @@ private func filterPoints(
 private func earcutLinked(
   _ nodes: inout Nodes,
   _ ear: Int32,
-  _ triangles: inout [UInt32],
+  _ triangles: inout TriangleBuffer,
   _ minX: Double,
   _ minY: Double,
   _ invSize: Double,
@@ -337,9 +347,7 @@ private func earcutLinked(
     if area(n, prev, ear, next) < 0,
        invSize > 0 ? isEarHashed(n, ear, minX, minY, invSize) : isEar(n, ear)
     {
-      triangles.append(n[Int(prev)].i)
-      triangles.append(n[Int(ear)].i)
-      triangles.append(n[Int(next)].i)
+      triangles.append(n[Int(prev)].i, n[Int(ear)].i, n[Int(next)].i)
 
       removeNode(n, ear)
       ear = next
@@ -447,7 +455,7 @@ private func isEarHashed(
 private func cureLocalIntersections(
   _ n: UnsafeMutablePointer<Node>,
   _ start: Int32,
-  _ triangles: inout [UInt32],
+  _ triangles: inout TriangleBuffer,
   _ steiners: [Int32])
   -> Int32
 {
@@ -461,9 +469,7 @@ private func cureLocalIntersections(
     if intersects(n, a, p, n[Int(p)].next, b, includeBoundary: false),
        locallyInside(n, a, b), locallyInside(n, b, a)
     {
-      triangles.append(n[Int(a)].i)
-      triangles.append(n[Int(p)].i)
-      triangles.append(n[Int(b)].i)
+      triangles.append(n[Int(a)].i, n[Int(p)].i, n[Int(b)].i)
 
       removeNode(n, p)
       removeNode(n, n[Int(p)].next)
@@ -483,7 +489,7 @@ private func cureLocalIntersections(
 private func splitEarcut(
   _ nodes: inout Nodes,
   _ start: Int32,
-  _ triangles: inout [UInt32],
+  _ triangles: inout TriangleBuffer,
   _ minX: Double,
   _ minY: Double,
   _ invSize: Double,
@@ -545,7 +551,7 @@ private struct HoleKey: Comparable {
 
 private func eliminateHoles(
   _ nodes: inout Nodes,
-  _ data: [Double],
+  _ data: UnsafeBufferPointer<Double>,
   _ holeIndices: [Int],
   _ outerNode: Int32,
   _ dim: Int,
@@ -970,7 +976,7 @@ private func splitPolygon(_ nodes: inout Nodes, _ a: Int32, _ b: Int32) -> Int32
   return b2
 }
 
-private func signedArea(_ data: [Double], _ start: Int, _ end: Int, _ dim: Int) -> Double {
+private func signedArea(_ data: UnsafeBufferPointer<Double>, _ start: Int, _ end: Int, _ dim: Int) -> Double {
   var sum: Double = 0
   var j = end - dim
   for i in stride(from: start, to: end, by: dim) {

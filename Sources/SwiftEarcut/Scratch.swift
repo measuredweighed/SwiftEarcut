@@ -41,3 +41,45 @@ struct Scratch {
     counts.deallocate()
   }
 }
+
+/// Output accumulator. Array.append would pay a uniqueness and a capacity check per index,
+/// three times per triangle, none of which hoist out of the slicing loop.
+struct TriangleBuffer {
+  private var base: UnsafeMutablePointer<UInt32>
+  private var count: Int
+  private var capacity: Int
+
+  init(minimumCapacity: Int) {
+    let capacity = Swift.max(minimumCapacity, 64)
+    self.base = .allocate(capacity: capacity)
+    self.count = 0
+    self.capacity = capacity
+  }
+
+  func deallocate() {
+    base.deallocate()
+  }
+
+  @inline(__always)
+  mutating func append(_ a: UInt32, _ b: UInt32, _ c: UInt32) {
+    if count + 3 > capacity { grow() }
+    base[count] = a
+    base[count + 1] = b
+    base[count + 2] = c
+    count += 3
+  }
+
+  @inline(never)
+  private mutating func grow() {
+    let capacity = self.capacity * 2
+    let fresh = UnsafeMutablePointer<UInt32>.allocate(capacity: capacity)
+    fresh.moveInitialize(from: base, count: count)
+    base.deallocate()
+    self.base = fresh
+    self.capacity = capacity
+  }
+
+  func makeArray() -> [UInt32] {
+    Array(UnsafeBufferPointer(start: base, count: count))
+  }
+}
