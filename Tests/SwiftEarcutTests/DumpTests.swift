@@ -13,8 +13,10 @@ final class DumpTests: XCTestCase {
       let data = try Data(contentsOf: dir.appendingPathComponent(file))
       guard let rings = try? JSONDecoder().decode([[[Double]]].self, from: data),
             let f = rings.first?.first, !f.isEmpty else { continue }
-      let flat = Earcut.flatten(rings)
-      out[name] = Earcut.tessellate(flat.vertices, holeIndices: flat.holes, dim: flat.dimensions)
+      out[name] = (0 ... 3).flatMap { quarter -> [UInt32] in
+        let flat = Earcut.flatten(FixtureTests.rotated(rings, quarter))
+        return Earcut.tessellate(flat.vertices, holeIndices: flat.holes, dim: flat.dimensions)
+      }
     }
     try JSONSerialization.data(withJSONObject: out, options: [.sortedKeys])
       .write(to: URL(fileURLWithPath: ProcessInfo.processInfo.environment["EARCUT_DUMP"]!))
