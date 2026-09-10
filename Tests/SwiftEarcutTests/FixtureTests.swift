@@ -34,8 +34,8 @@ final class FixtureTests: XCTestCase {
     guard let rings = Self.rings(name) else { return "missing fixture" }
     guard let expectedTriangles = Self.expected.triangles[name] else { return "no expected entry" }
 
-    let flat = Earcut.flatten(data: rings)
-    let indices = Earcut.tessellate(data: flat.vertices, holeIndices: flat.holes, dim: flat.dim)
+    let flat = Earcut.flatten(rings)
+    let indices = Earcut.tessellate(flat.vertices, holeIndices: flat.holes, dim: flat.dimensions)
     let count = indices.count / 3
     if count != expectedTriangles {
       return "expected \(expectedTriangles) triangles, got \(count)"
@@ -44,7 +44,7 @@ final class FixtureTests: XCTestCase {
 
     let tolerance = Self.expected.errors[name] ?? 1e-14
     let deviation = Earcut.deviation(
-      data: flat.vertices, holeIndices: flat.holes, dim: flat.dim, indices: indices)
+      flat.vertices, holeIndices: flat.holes, dim: flat.dimensions, triangles: indices)
     if !(deviation < tolerance) {
       return "deviation \(deviation) exceeded \(tolerance)"
     }

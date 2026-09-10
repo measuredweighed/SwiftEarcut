@@ -16,7 +16,7 @@ struct Fixture {
   let name: String
   let vertices: [Double]
   let holes: [Int]
-  let dim: Int
+  let dimensions: Int
 }
 
 func fixtureDirectory() -> URL {
@@ -34,27 +34,27 @@ func loadFixtures(_ directory: URL) -> [Fixture] {
   let names = (try? FileManager.default.contentsOfDirectory(atPath: directory.path)) ?? []
   return names.filter { $0.hasSuffix(".json") && $0 != "expected.json" && !$0.hasPrefix("golden") }
     .sorted()
-    .compactMap { name in
+    .compactMap { name -> Fixture? in
       guard
         let data = try? Data(contentsOf: directory.appendingPathComponent(name)),
         let rings = try? JSONDecoder().decode([[[Double]]].self, from: data),
         let first = rings.first?.first, !first.isEmpty
       else { return nil }
-      let flat = Earcut.flatten(data: rings)
-      return Fixture(name: String(name.dropLast(5)), vertices: flat.vertices, holes: flat.holes, dim: flat.dim)
+      let flat = Earcut.flatten(rings)
+      return Fixture(name: String(name.dropLast(5)), vertices: flat.vertices, holes: flat.holes, dimensions: flat.dimensions)
     }
 }
 
 func measure(_ fixture: Fixture, budget: Double) -> (opsPerSec: Double, triangles: Int) {
   var triangles = 0
   for _ in 0..<3 {
-    triangles = Earcut.tessellate(data: fixture.vertices, holeIndices: fixture.holes, dim: fixture.dim).count / 3
+    triangles = Earcut.tessellate(fixture.vertices, holeIndices: fixture.holes, dim: fixture.dimensions).count / 3
   }
   var ops = 0
   let start = now()
   var elapsed = 0.0
   repeat {
-    _ = Earcut.tessellate(data: fixture.vertices, holeIndices: fixture.holes, dim: fixture.dim)
+    _ = Earcut.tessellate(fixture.vertices, holeIndices: fixture.holes, dim: fixture.dimensions)
     ops += 1
     elapsed = now() - start
   } while elapsed < budget
@@ -87,7 +87,7 @@ for fixture in fixtures {
   let micros = 1_000_000 / ops
   totalMicros += micros
   print(pad(fixture.name, 24)
-    + padLeft("\(fixture.vertices.count / fixture.dim)", 8)
+    + padLeft("\(fixture.vertices.count / fixture.dimensions)", 8)
     + padLeft("\(triangles)", 8)
     + padLeft(String(format: "%.1f", ops), 14)
     + padLeft(String(format: "%.2f", micros), 12))

@@ -7,14 +7,14 @@ final class DumpTests: XCTestCase {
   func testDumpIndices() throws {
     try XCTSkipIf(ProcessInfo.processInfo.environment["EARCUT_DUMP"] == nil)
     let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent("fixtures")
-    var out = [String: [Int]]()
+    var out = [String: [UInt32]]()
     for file in try FileManager.default.contentsOfDirectory(atPath: dir.path).sorted() where file.hasSuffix(".json") {
       let name = String(file.dropLast(5))
       let data = try Data(contentsOf: dir.appendingPathComponent(file))
       guard let rings = try? JSONDecoder().decode([[[Double]]].self, from: data),
             let f = rings.first?.first, !f.isEmpty else { continue }
-      let flat = Earcut.flatten(data: rings)
-      out[name] = Earcut.tessellate(data: flat.vertices, holeIndices: flat.holes, dim: flat.dim)
+      let flat = Earcut.flatten(rings)
+      out[name] = Earcut.tessellate(flat.vertices, holeIndices: flat.holes, dim: flat.dimensions)
     }
     try JSONSerialization.data(withJSONObject: out, options: [.sortedKeys])
       .write(to: URL(fileURLWithPath: ProcessInfo.processInfo.environment["EARCUT_DUMP"]!))

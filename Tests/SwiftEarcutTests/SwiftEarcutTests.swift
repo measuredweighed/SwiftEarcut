@@ -4,16 +4,16 @@ import XCTest
 final class EarcutTests: XCTestCase {
 
   func testEmpty() {
-    XCTAssertEqual(Earcut.tessellate(data: [], holeIndices: []), [])
+    XCTAssertEqual(Earcut.tessellate([], holeIndices: []), [] as [UInt32])
   }
 
   func testIndices2D() {
-    XCTAssertEqual(Earcut.tessellate(data: [10, 0, 0, 50, 60, 60, 70, 10]), [1, 0, 3, 1, 3, 2])
+    XCTAssertEqual(Earcut.tessellate([10, 0, 0, 50, 60, 60, 70, 10]), [1, 0, 3, 1, 3, 2])
   }
 
   func testIndices3D() {
     XCTAssertEqual(
-      Earcut.tessellate(data: [10, 0, 0, 0, 50, 0, 60, 60, 0, 70, 10, 0], dim: 3), [1, 0, 3, 1, 3, 2])
+      Earcut.tessellate([10, 0, 0, 0, 50, 0, 60, 60, 0, 70, 10, 0], dim: 3), [1, 0, 3, 1, 3, 2])
   }
 
   func testInfiniteLoop() {

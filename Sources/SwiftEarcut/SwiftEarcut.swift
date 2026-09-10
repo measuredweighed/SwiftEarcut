@@ -24,7 +24,7 @@ public enum Earcut {
   /// Whether the outer ring or the holes are closed (identical first and last corner point) does not have to be considered (see example).
   /// # Example #
   /// ```swift
-  /// Earcut.tessellate(data: [
+  /// Earcut.tessellate([
   ///       0.0,0.0,0.0, 9.0,0.0,0.0, 6.0,8.0,0.0, 5.0,3.0,0.0, 2.0,8.0,0.0, 0.0,8.0,0.0,
   ///       6.0,2.0,0.0, 7.0,1.0,0.0, 7.0,3.0,0.0, 6.0,3.0,0.0, 5.0,2.0,0.0, 6.0,2.0,0.0,
   ///   ],
@@ -32,8 +32,8 @@ public enum Earcut {
   ///   dim: 3
   /// )
   /// ```
-  public static func tessellate(data: [Double], holeIndices: [Int] = [], dim: Int = 2) -> [Int] {
-    var triangles = [Int]()
+  public static func tessellate(_ data: [Double], holeIndices: [Int] = [], dim: Int = 2) -> [UInt32] {
+    var triangles = [UInt32]()
     guard data.count > 0 else { return triangles }
 
     let hasHoles = holeIndices.count > 0
@@ -84,14 +84,14 @@ public enum Earcut {
     return triangles
   }
 
-  /// Converts a multi-dimensional array of vertices (e.g. GeoJSON Polygon) to the format expected by the ``tessellate(data:holeIndices:dim:)`` method. Returns (1) flattened array of Doubles with the vertices coordinate components, (2) indices of potential holes in the polygon, and  (3) the coordinate's dimension.
+  /// Converts a multi-dimensional array of vertices (e.g. GeoJSON Polygon) to the format expected by the ``tessellate(_:holeIndices:dim:)`` method. Returns (1) flattened array of Doubles with the vertices coordinate components, (2) indices of potential holes in the polygon, and  (3) the coordinate's dimension.
   /// - Parameter data:Multi-dimensional array with vertices, like [[exterior],[hole0],[hole1]] and [[[x0,y0,z0],[x1,y1,z1],[x2,y2,z2]],[[x3,y3,z3],[x4,y4,z4],[x5,y5,z5]], ...]
   /// - Returns: `vertices`: Array of double values containing the coordinate components of all vertices. `holes`: Indices of the polygon's holes, if any. `dim`: Number of coordinates per vertex.
-  public static func flatten(data: [[[Double]]]) -> (vertices: [Double], holes: [Int], dim: Int) {
+  public static func flatten(_ data: [[[Double]]]) -> (vertices: [Double], holes: [Int], dimensions: Int) {
     let dim = data[0][0].count
 
     var holeIndex = 0
-    var result: (vertices: [Double], holes: [Int], dim: Int) = (vertices: [Double](), holes: [Int](), dim: dim)
+    var result: (vertices: [Double], holes: [Int], dimensions: Int) = ([Double](), [Int](), dim)
     for i in 0 ..< data.count {
       for j in 0 ..< data[i].count {
         for d in 0 ..< dim {
@@ -111,9 +111,15 @@ public enum Earcut {
   /// - Parameter data: Flat array of vertex coordinates.
   /// - Parameter holeIndices: If any (e.g. [5, 8] for a 12-vertex input would mean one hole with vertices 5–7 and another with 8–11).
   /// - Parameter dim: Number of coordinates per vertex in the input array (2 by default).
-  /// - Parameter indices: Array of point indices produced by ``tessellate(data:holeIndices:dim:)``.
+  /// - Parameter triangles: Array of point indices produced by ``tessellate(_:holeIndices:dim:)``.
   /// - Returns: Percentage difference between the polygon area and its triangulation area. 0 means the triangulation is fully correct.
-  public static func deviation(data: [Double], holeIndices: [Int] = [], dim: Int = 2, indices: [Int]) -> Double {
+  public static func deviation(
+    _ data: [Double],
+    holeIndices: [Int] = [],
+    dim: Int = 2,
+    triangles: [UInt32])
+    -> Double
+  {
     let hasHoles = holeIndices.count > 0
     let outerLen = hasHoles ? holeIndices[0] * dim : data.count
 
@@ -128,10 +134,10 @@ public enum Earcut {
     }
 
     var trianglesArea: Double = 0
-    for i in stride(from: 0, to: indices.count, by: 3) {
-      let a = indices[i] * dim
-      let b = indices[i + 1] * dim
-      let c = indices[i + 2] * dim
+    for i in stride(from: 0, to: triangles.count, by: 3) {
+      let a = Int(triangles[i]) * dim
+      let b = Int(triangles[i + 1]) * dim
+      let c = Int(triangles[i + 2]) * dim
       trianglesArea += abs(
         (data[a] - data[c]) * (data[b + 1] - data[a + 1]) -
           (data[a] - data[b]) * (data[c + 1] - data[a + 1]))
@@ -147,6 +153,34 @@ public enum Earcut {
       return abs(polygonArea) <= Double(data.count) * maximum * maximum * .ulpOfOne ? 0 : 1
     }
     return abs((trianglesArea - polygonArea) / polygonArea)
+  }
+}
+
+extension Earcut {
+
+  @available(*, deprecated, renamed: "tessellate(_:holeIndices:dim:)",
+             message: "Indices are now [UInt32]. Use tessellate(_:holeIndices:dim:).")
+  public static func tessellate(data: [Double], holeIndices: [Int] = [], dim: Int = 2) -> [Int] {
+    tessellate(data, holeIndices: holeIndices, dim: dim).map(Int.init)
+  }
+
+  @available(*, deprecated, renamed: "flatten(_:)",
+             message: "The dim tuple element is now named dimensions. Use flatten(_:).")
+  public static func flatten(data: [[[Double]]]) -> (vertices: [Double], holes: [Int], dim: Int) {
+    let result = flatten(data)
+    return (result.vertices, result.holes, result.dimensions)
+  }
+
+  @available(*, deprecated, renamed: "deviation(_:holeIndices:dim:triangles:)",
+             message: "Indices are now [UInt32]. Use deviation(_:holeIndices:dim:triangles:).")
+  public static func deviation(
+    data: [Double],
+    holeIndices: [Int] = [],
+    dim: Int = 2,
+    indices: [Int])
+    -> Double
+  {
+    deviation(data, holeIndices: holeIndices, dim: dim, triangles: indices.map(UInt32.init))
   }
 }
 
@@ -278,7 +312,7 @@ private func filterPoints(
 private func earcutLinked(
   _ nodes: inout Nodes,
   _ ear: Int32,
-  _ triangles: inout [Int],
+  _ triangles: inout [UInt32],
   _ minX: Double,
   _ minY: Double,
   _ invSize: Double,
@@ -303,9 +337,9 @@ private func earcutLinked(
     if area(n, prev, ear, next) < 0,
        invSize > 0 ? isEarHashed(n, ear, minX, minY, invSize) : isEar(n, ear)
     {
-      triangles.append(Int(n[Int(prev)].i))
-      triangles.append(Int(n[Int(ear)].i))
-      triangles.append(Int(n[Int(next)].i))
+      triangles.append(n[Int(prev)].i)
+      triangles.append(n[Int(ear)].i)
+      triangles.append(n[Int(next)].i)
 
       removeNode(n, ear)
       ear = next
@@ -413,7 +447,7 @@ private func isEarHashed(
 private func cureLocalIntersections(
   _ n: UnsafeMutablePointer<Node>,
   _ start: Int32,
-  _ triangles: inout [Int],
+  _ triangles: inout [UInt32],
   _ steiners: [Int32])
   -> Int32
 {
@@ -427,9 +461,9 @@ private func cureLocalIntersections(
     if intersects(n, a, p, n[Int(p)].next, b, includeBoundary: false),
        locallyInside(n, a, b), locallyInside(n, b, a)
     {
-      triangles.append(Int(n[Int(a)].i))
-      triangles.append(Int(n[Int(p)].i))
-      triangles.append(Int(n[Int(b)].i))
+      triangles.append(n[Int(a)].i)
+      triangles.append(n[Int(p)].i)
+      triangles.append(n[Int(b)].i)
 
       removeNode(n, p)
       removeNode(n, n[Int(p)].next)
@@ -449,7 +483,7 @@ private func cureLocalIntersections(
 private func splitEarcut(
   _ nodes: inout Nodes,
   _ start: Int32,
-  _ triangles: inout [Int],
+  _ triangles: inout [UInt32],
   _ minX: Double,
   _ minY: Double,
   _ invSize: Double,

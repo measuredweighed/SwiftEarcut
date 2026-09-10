@@ -11,13 +11,13 @@ final class RobustnessTests: XCTestCase {
       vertices.append(10 * sin(a))
     }
     vertices += [-5, 0, 0, -50, 0, 50]
-    let result = Earcut.tessellate(data: vertices, holeIndices: [n], dim: 2)
+    let result = Earcut.tessellate(vertices, holeIndices: [n], dim: 2)
     XCTAssertFalse(result.isEmpty)
   }
 
   func testEmptyHoleRing() {
     let square: [Double] = [0, 0, 10, 0, 10, 10, 0, 10]
-    XCTAssertEqual(Earcut.tessellate(data: square, holeIndices: [4], dim: 2).count, 6)
+    XCTAssertEqual(Earcut.tessellate(square, holeIndices: [4], dim: 2).count, 6)
   }
 
   func testNodeLayoutIsUnpadded() {
