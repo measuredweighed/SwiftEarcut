@@ -17,7 +17,6 @@ final class EarcutTests: XCTestCase {
   }
 
   func testInfiniteLoop() {
-    _ = Earcut.tessellate(
-      data: [1, 2, 2, 2, 1, 2, 1, 1, 1, 2, 4, 1, 5, 1, 3, 2, 4, 2, 4, 1], holeIndices: [5], dim: 3)
+    _ = Earcut.tessellate([1, 2, 2, 2, 1, 2, 1, 1, 1, 2, 4, 1, 5, 1, 3, 2, 4, 2, 4, 1], holeIndices: [5], dim: 3)
   }
 }
